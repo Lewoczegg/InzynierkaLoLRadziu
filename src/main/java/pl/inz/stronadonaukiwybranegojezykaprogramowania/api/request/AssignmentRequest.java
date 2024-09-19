@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class AssignmentRequest {
     private String code;
     private String taskId;
+    private String language;
 }

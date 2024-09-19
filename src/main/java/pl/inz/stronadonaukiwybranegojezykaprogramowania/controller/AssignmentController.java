@@ -23,10 +23,11 @@ public class AssignmentController {
 
     @PostMapping("/submit")
     public ResponseEntity<CodeExecutionResponse> submitCode(@RequestBody AssignmentRequest submission) {
-        String userCode = submission.getCode();
-        String taskId = submission.getTaskId();
-        CodeExecutionResponse result = assignmentService.codeFromGuest(userCode, taskId);
-
+        CodeExecutionResponse result = assignmentService.codeFromGuest(
+                submission.getCode(),
+                submission.getTaskId(),
+                submission.getLanguage()
+        );
         return ResponseEntity.ok(result);
     }
 }

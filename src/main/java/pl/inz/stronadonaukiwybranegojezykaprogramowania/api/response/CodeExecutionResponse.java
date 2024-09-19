@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CodeExecutionResponse {
     private String output;
+    private String userOutput;
     private String errorOutput;
     private String buildOutput;
     private String buildErrorOutput;
