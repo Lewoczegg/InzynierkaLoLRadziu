@@ -9,28 +9,32 @@ import java.util.UUID;
 
 @Service
 public class AssignmentService {
-//    private static final String DOCKER_IMAGE_NAME_PREFIX = "my-java-app-";
-    public CodeExecutionResponse codeFromGuest(String userCode) {
+    public CodeExecutionResponse codeFromGuest(String userCode, String taskId) {
         CodeExecutionResponse result = new CodeExecutionResponse();
         String uniqueId = UUID.randomUUID().toString();
-        String workingDirPath = "/tmp/" + uniqueId; // Unikalny katalog dla każdego wykonania
+        String workingDirPath = "/tmp/" + uniqueId;
         Path workingDir = Paths.get(workingDirPath);
 
         try {
-            // 1. Utwórz unikalny katalog roboczy
             Files.createDirectories(workingDir);
 
-            // 2. Zapisz kod użytkownika do Result.java
             Path resultFilePath = workingDir.resolve("Result.java");
             Files.writeString(resultFilePath, userCode);
 
-            // 2. Odczytaj zawartość CombinedResultMain.java
-            Path mainFilePath = Paths.get("src/scripts/CombinedResultMain.java");
-            Path combinedMainFilePath = workingDir.resolve("CombinedResultMain.java");
+            String mainFileName = "Task" + taskId + "Main.java";
+            Path mainFilePath = Paths.get("src/scripts/"  + mainFileName);
+
+            if (!Files.exists(mainFilePath)) {
+                result.setSuccess(false);
+                result.setErrorMessage("Nie znaleziono zadania o podanym ID.");
+                deleteDirectory(workingDir.toFile());
+                return result;
+            }
+
+            Path combinedMainFilePath = workingDir.resolve(mainFileName);
             Files.copy(mainFilePath, combinedMainFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // 4. Skompiluj kod wewnątrz kontenera Dockera
-            String compileCommand = "javac Result.java CombinedResultMain.java";
+            String compileCommand = "javac Result.java " + mainFileName;
             String[] compileCmd = {
                     "docker", "run", "--rm",
                     "-v", workingDir.toAbsolutePath() + ":/app",
@@ -42,26 +46,23 @@ public class AssignmentService {
             ProcessBuilder compileProcessBuilder = new ProcessBuilder(compileCmd);
             Process compileProcess = compileProcessBuilder.start();
 
-            // Przechwyć wyjście kompilacji
             String compileOutput = readProcessOutput(compileProcess.getInputStream());
             String compileErrorOutput = readProcessOutput(compileProcess.getErrorStream());
 
             int compileExitCode = compileProcess.waitFor();
 
-            // Ustawienie wyników kompilacji w obiekcie ExecutionResult
             result.setBuildOutput(compileOutput);
             result.setBuildErrorOutput(compileErrorOutput);
 
             if (compileExitCode != 0) {
                 result.setSuccess(false);
                 result.setErrorMessage("Kompilacja nie powiodła się.");
-                // Usuń katalog roboczy
                 deleteDirectory(workingDir.toFile());
                 return result;
             }
 
-            // 5. Uruchom skompilowany kod wewnątrz kontenera Dockera
-            String runCommand = "java CombinedResultMain";
+            String mainClassName = mainFileName.replace(".java", "");
+            String runCommand = "java " + mainClassName;
             String[] runCmd = {
                     "docker", "run", "--rm",
                     "-v", workingDir.toAbsolutePath() + ":/app",
@@ -73,7 +74,6 @@ public class AssignmentService {
             ProcessBuilder runProcessBuilder = new ProcessBuilder(runCmd);
             Process runProcess = runProcessBuilder.start();
 
-            // Przechwyć wyjście wykonania
             String output = readProcessOutput(runProcess.getInputStream());
             String errorOutput = readProcessOutput(runProcess.getErrorStream());
 
@@ -85,14 +85,12 @@ public class AssignmentService {
             if (runExitCode != 0) {
                 result.setSuccess(false);
                 result.setErrorMessage("Wykonanie kodu nie powiodło się.");
-                // Usuń katalog roboczy
                 deleteDirectory(workingDir.toFile());
                 return result;
             }
 
             result.setSuccess(true);
 
-            // 6. Usuń katalog roboczy
             deleteDirectory(workingDir.toFile());
 
         } catch (IOException | InterruptedException e) {

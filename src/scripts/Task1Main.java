@@ -1,4 +1,4 @@
-public class CombinedResultMain {
+public class Task1Main {
     public static void main(String[] args) {
         int[][] inputs = {
                 {1, 2},
@@ -23,7 +23,7 @@ public class CombinedResultMain {
                 System.out.println("Test failed for input: " + input[0] + " and " + input[1] + ". Expected: " + expectedResult + ", but got: " + result);
             }
         }
-        System.out.println("..........ANSWER..........");
+//        System.out.println("..........ANSWER..........");
 
     }
 }

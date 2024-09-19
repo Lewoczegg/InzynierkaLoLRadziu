@@ -11,10 +11,10 @@ fi
 
 ##!/bin/bash
 #
-#cat > CombinedResultMain.java
+#cat > Task1Main.java
 #
 #
-#javac CombinedResultMain.java
+#javac Task1Main.java
 #
 #
 #if [ $? -eq 0 ]; then

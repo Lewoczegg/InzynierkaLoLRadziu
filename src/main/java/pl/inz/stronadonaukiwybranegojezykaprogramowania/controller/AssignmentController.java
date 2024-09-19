@@ -24,7 +24,8 @@ public class AssignmentController {
     @PostMapping("/submit")
     public ResponseEntity<CodeExecutionResponse> submitCode(@RequestBody AssignmentRequest submission) {
         String userCode = submission.getCode();
-        CodeExecutionResponse result = assignmentService.codeFromGuest(userCode);
+        String taskId = submission.getTaskId();
+        CodeExecutionResponse result = assignmentService.codeFromGuest(userCode, taskId);
 
         return ResponseEntity.ok(result);
     }
