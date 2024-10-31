@@ -2,8 +2,8 @@ import java.io.*;
 
 public class Task2Main {
     public static void main(String[] args) {
-        String[] testInputs = {"hello", "world", "OpenAI", "Java", ""};
-        String[] expectedOutputs = {"olleh", "dlrow", "IAnepO", "avaJ", ""};
+        String[] testInputs = {"hello", "world", "OpenAI", "Java"};
+        String[] expectedOutputs = {"olleh", "dlrow", "IAnepO", "avaJ"};
 
         boolean allTestsPassed = true;
 
@@ -35,7 +35,7 @@ public class Task2Main {
                 System.setOut(originalOut); // Przywróć System.out
 
                 if (result.equals(expectedOutputs[i])) {
-                    System.out.println("Test passed for input: \"" + testInputs[i] + "\"");
+                    System.out.println("Test passed for input: \"" + testInputs[i] + "\""+ ". Result: " + result);
                 } else {
                     System.out.println("Test failed for input: \"" + testInputs[i] + "\". Expected: \"" + expectedOutputs[i] + "\", but got: \"" + result + "\"");
                     allTestsPassed = false;

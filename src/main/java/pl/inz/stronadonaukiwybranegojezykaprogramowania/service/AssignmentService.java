@@ -1,14 +1,26 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecutionResponse;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Assignment;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.AssignmentRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.LessonRepository;
 
 import java.io.*;
 import java.nio.file.*;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AssignmentService {
+    @Autowired
+    private AssignmentRepository assignmentRepository;
+    @Autowired
+    private LessonRepository lessonRepository;
     public CodeExecutionResponse codeFromGuest(String userCode, String taskId, String language){
         if ("java".equalsIgnoreCase(language)) {
             return executeJavaCode(userCode, taskId);
@@ -24,18 +36,15 @@ public class AssignmentService {
     public CodeExecutionResponse executePythonCode(String userCode, String taskId) {
         CodeExecutionResponse result = new CodeExecutionResponse();
         String uniqueId = UUID.randomUUID().toString();
-        String workingDirPath = "/path/to/temp/" + uniqueId; // Zmień na rzeczywistą ścieżkę
+        String workingDirPath = "/path/to/temp/" + uniqueId;
         Path workingDir = Paths.get(workingDirPath);
 
         try {
-            // 1. Utwórz unikalny katalog roboczy
             Files.createDirectories(workingDir);
 
-            // 2. Zapisz kod użytkownika do pliku user_code.py
             Path userCodePath = workingDir.resolve("user_code.py");
             Files.writeString(userCodePath, userCode);
 
-            // 3. Przygotuj plik testowy na podstawie taskId
             String testFileName = "task" + taskId + ".py";
             Path testFilePath = Paths.get("src/scripts/python_tasks/" + testFileName);
 
@@ -49,7 +58,6 @@ public class AssignmentService {
             Path copiedTestFilePath = workingDir.resolve(testFileName);
             Files.copy(testFilePath, copiedTestFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // 4. Uruchom testy wewnątrz kontenera Dockera
             String runCommand = "python " + testFileName;
             String[] runCmd = {
                     "docker", "run", "--rm",
@@ -62,23 +70,21 @@ public class AssignmentService {
             ProcessBuilder runProcessBuilder = new ProcessBuilder(runCmd);
             Process runProcess = runProcessBuilder.start();
 
-            // Przechwyć wyjście wykonania
             String output = readProcessOutput(runProcess.getInputStream());
             String errorOutput = readProcessOutput(runProcess.getErrorStream());
 
             int runExitCode = runProcess.waitFor();
 
             result.setOutput(output);
-            result.setErrorOutput(errorOutput);
 
             if (runExitCode != 0) {
                 result.setSuccess(false);
+                result.setOutput(errorOutput);
                 result.setErrorMessage("Wykonanie kodu nie powiodło się.");
                 deleteDirectory(workingDir.toFile());
                 return result;
             }
 
-            // 5. Odczytaj userOutput z pliku
             Path userOutputPath = workingDir.resolve("user_output.txt");
             if (Files.exists(userOutputPath)) {
                 String userOutput = Files.readString(userOutputPath);
@@ -89,7 +95,6 @@ public class AssignmentService {
 
             result.setSuccess(true);
 
-            // 6. Usuń katalog roboczy
             deleteDirectory(workingDir.toFile());
 
         } catch (IOException | InterruptedException e) {
@@ -126,7 +131,6 @@ public class AssignmentService {
             Path combinedMainFilePath = workingDir.resolve(mainFileName);
             Files.copy(mainFilePath, combinedMainFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // 4. Skompiluj kod wewnątrz kontenera Dockera
             String compileCommand = "javac Result.java " + mainFileName;
             String[] compileCmd = {
                     "docker", "run", "--rm",
@@ -139,25 +143,21 @@ public class AssignmentService {
             ProcessBuilder compileProcessBuilder = new ProcessBuilder(compileCmd);
             Process compileProcess = compileProcessBuilder.start();
 
-            // Przechwyć wyjście kompilacji
             String compileOutput = readProcessOutput(compileProcess.getInputStream());
             String compileErrorOutput = readProcessOutput(compileProcess.getErrorStream());
 
             int compileExitCode = compileProcess.waitFor();
 
-            // Ustawienie wyników kompilacji w obiekcie ExecutionResult
             result.setBuildOutput(compileOutput);
-            result.setBuildErrorOutput(compileErrorOutput);
 
             if (compileExitCode != 0) {
+                result.setOutput(compileErrorOutput);
                 result.setSuccess(false);
                 result.setErrorMessage("Kompilacja nie powiodła się.");
-                // Usuń katalog roboczy
                 deleteDirectory(workingDir.toFile());
                 return result;
             }
 
-            // 5. Uruchom skompilowany kod wewnątrz kontenera Dockera
             String mainClassName = mainFileName.replace(".java", "");
             String runCommand = "java " + mainClassName;
             String[] runCmd = {
@@ -171,24 +171,20 @@ public class AssignmentService {
             ProcessBuilder runProcessBuilder = new ProcessBuilder(runCmd);
             Process runProcess = runProcessBuilder.start();
 
-            // Przechwyć wyjście wykonania
             String output = readProcessOutput(runProcess.getInputStream());
             String errorOutput = readProcessOutput(runProcess.getErrorStream());
 
             int runExitCode = runProcess.waitFor();
 
             result.setOutput(output);
-            result.setErrorOutput(errorOutput);
 
             if (runExitCode != 0) {
                 result.setSuccess(false);
                 result.setErrorMessage("Wykonanie kodu nie powiodło się.");
-                // Usuń katalog roboczy
                 deleteDirectory(workingDir.toFile());
                 return result;
             }
 
-            // 6. Odczytaj userOutput z pliku
             Path userOutputPath = workingDir.resolve("user_output.txt");
             if (Files.exists(userOutputPath)) {
                 String userOutput = Files.readString(userOutputPath);
@@ -199,7 +195,6 @@ public class AssignmentService {
 
             result.setSuccess(true);
 
-            // 7. Usuń katalog roboczy
             deleteDirectory(workingDir.toFile());
 
         } catch (IOException | InterruptedException e) {
@@ -234,5 +229,27 @@ public class AssignmentService {
             output.append(line).append("\n");
         }
         return output.toString();
+    }
+
+    public Assignment createAssignment(String title, String description, Long lessonId) {
+        Optional<Lesson> lessonOpt = lessonRepository.findById(lessonId);
+        if (lessonOpt.isEmpty()){
+            throw new RuntimeException("Lesson not found");
+        }
+        Assignment assignment = new Assignment();
+        assignment.setTitle(title);
+        assignment.setDescription(description);
+        assignment.setLesson(lessonOpt.get());
+        assignment.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        assignment.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+        return assignmentRepository.save(assignment);
+    }
+
+    public List<Assignment> getAllAssignments() {
+        return assignmentRepository.findAll();
+    }
+    public Optional<Assignment> getAssignmentById(Long id) {
+        return assignmentRepository.findById(id);
     }
 }

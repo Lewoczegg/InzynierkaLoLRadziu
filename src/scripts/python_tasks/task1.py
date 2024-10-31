@@ -1,45 +1,66 @@
-import unittest
 import sys
 import io
-from user_code import sum
 
-class TestSumFunction(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        # Przechwytywanie wyjścia użytkownika podczas pierwszego wywołania
-        cls.user_output = io.StringIO()
-        original_stdout = sys.stdout
-        sys.stdout = cls.user_output
+def main():
+    inputs = [
+        (1, 2),
+        (3, 4),
+        (10, 20)
+    ]
+    expected_results = [
+        3,
+        7,
+        30
+    ]
 
-        # Wywołaj funkcję użytkownika raz, aby przechwycić wyjście
-        sum(1, 2)
+    all_tests_passed = True
 
-        # Zapisz wyjście użytkownika do pliku
-        with open('user_output.txt', 'w') as f:
-            f.write(cls.user_output.getvalue())
+    # Przechwyć wyjście użytkownika podczas pierwszego wywołania
+    user_output = io.StringIO()
+    original_stdout = sys.stdout
+    sys.stdout = user_output
 
-        # Przywróć stdout
+    # Importuj kod użytkownika
+    from user_code import sum
+
+    # Wywołaj funkcję użytkownika raz, aby przechwycić wyjście
+    sum(*inputs[0])
+
+    # Przywróć stdout
+    sys.stdout = original_stdout
+
+    # Zapisz wyjście użytkownika do pliku
+    with open('user_output.txt', 'w') as f:
+        f.write(user_output.getvalue())
+
+    # Wykonaj testy, ignorując wyjście użytkownika
+    for i, input_pair in enumerate(inputs):
+        a, b = input_pair
+        expected = expected_results[i]
+
+        # Ignoruj wyjście użytkownika podczas testów
+        sys.stdout = open('/dev/null', 'w')
+
+        try:
+            result = sum(a, b)
+        except Exception as e:
+            sys.stdout = original_stdout
+            print(f"Test failed for input: {a}, {b}. Exception occurred: {e}")
+            all_tests_passed = False
+            continue
+
         sys.stdout = original_stdout
 
-    def test_sum(self):
-        # Przekieruj stdout na null podczas testów
-        null_output = open('/dev/null', 'w')
-        sys.stdout = null_output
+        if result == expected:
+            print(f"Test passed for input: {a} and {b}. Result: {result}")
+        else:
+            print(f"Test failed for input: {a} and {b}. Expected: {expected}, but got: {result}")
+            all_tests_passed = False
 
-        test_cases = [
-            ((1, 2), 3),
-            ((3, 4), 7),
-            ((10, 20), 30)
-        ]
-        for inputs, expected in test_cases:
-            result = sum(*inputs)
-            self.assertEqual(result, expected, f"Failed for inputs: {inputs}")
+    if all_tests_passed:
+        print("All tests passed!")
+    else:
+        print("Some tests failed.")
 
-        # Przywróć stdout
-        sys.stdout = sys.__stdout__
-        null_output.close()
-
-if __name__ == '__main__':
-    # Użyj test runnera, który wypisuje wyniki na stdout
-    runner = unittest.TextTestRunner(stream=sys.stdout, verbosity=2)
-    unittest.main(testRunner=runner, exit=False)
+if __name__ == "__main__":
+    main()
