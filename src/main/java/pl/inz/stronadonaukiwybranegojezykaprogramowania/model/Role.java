@@ -3,12 +3,13 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "role")
-public class Role {
+public class Role{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,5 +17,4 @@ public class Role {
 
     @Column(nullable = false, unique = true)
     private String roleName;
-
 }
