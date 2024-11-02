@@ -10,3 +10,4 @@ import java.util.List;
 public interface SolutionsRepository extends JpaRepository<Solutions, Long> {
     List<Solutions> findByAssignment_AssignmentId(Long assignmentId);
 }
+

@@ -28,9 +28,6 @@ public class Progress {
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;
 
-    @Column(nullable = false)
-    private Boolean completed;
-
     private Timestamp completedAt;
 
 }

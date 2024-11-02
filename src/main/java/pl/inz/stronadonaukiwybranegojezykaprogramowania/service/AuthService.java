@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.RegisterRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.UpdateUserRequest;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.RoleRepository;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
@@ -58,6 +59,8 @@ public class AuthService {
         user.setPhoneNumber(registerRequest.getPhoneNumber());
         user.setAge(registerRequest.getAge());
         user.setRole(roleRepository.findRoleByroleId(2L).get());
+        user.setTitle(Title.BEGINNER);
+        user.setLevel(1);
         user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
         userRepository.save(user);

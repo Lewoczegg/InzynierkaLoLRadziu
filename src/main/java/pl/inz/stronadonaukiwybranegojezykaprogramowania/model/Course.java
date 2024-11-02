@@ -2,6 +2,7 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
 
 
 import java.sql.Timestamp;
@@ -27,5 +28,9 @@ public class Course {
 
     @Column(nullable = false)
     private Timestamp updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Title titleLvl;
 
 }

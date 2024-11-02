@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
 
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -52,6 +53,13 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private Timestamp updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Title title;
+
+    @Column(nullable = false)
+    private Integer level;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

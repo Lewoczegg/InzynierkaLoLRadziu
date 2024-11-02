@@ -1,5 +1,6 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.LoginRequest;
@@ -9,8 +10,10 @@ import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.JwtResponse
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.AuthService;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,10 +21,11 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserRepository userRepository;
-
-    public AuthController(AuthService authService, UserRepository userRepository) {
+    private final UserService userService;
+    public AuthController(AuthService authService, UserRepository userRepository, UserService userService) {
         this.authService = authService;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -59,4 +63,15 @@ public class AuthController {
         List<User> users = userRepository.findAll();
         return ResponseEntity.ok(users);
     }
+
+    @GetMapping("/user-info")
+    public ResponseEntity<Map<String, Object>> getUserInfo() {
+        try {
+            Map<String, Object> userInfo = userService.getUserInfo();
+            return ResponseEntity.ok(userInfo);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }

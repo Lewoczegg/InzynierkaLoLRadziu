@@ -1,26 +1,94 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecutionResponse;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Assignment;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.AssignmentRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.LessonRepository;
+
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.*;
+
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.*;
 
 import java.io.*;
 import java.nio.file.*;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class AssignmentService {
-    @Autowired
-    private AssignmentRepository assignmentRepository;
-    @Autowired
-    private LessonRepository lessonRepository;
+
+    private final AssignmentRepository assignmentRepository;
+    private final LessonRepository lessonRepository;
+    private final SubmissionRepository submissionRepository;
+    private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
+    private final ProgressService progressService;
+    public AssignmentService(AssignmentRepository assignmentRepository, LessonRepository lessonRepository, SubmissionRepository submissionRepository, UserRepository userRepository, CourseRepository courseRepository, ProgressService progressService) {
+        this.assignmentRepository = assignmentRepository;
+        this.lessonRepository = lessonRepository;
+        this.submissionRepository = submissionRepository;
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
+        this.progressService = progressService;
+    }
+
+    public CodeExecutionResponse submitCode(String userCode, String taskId, String language) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new IllegalStateException("User is not authenticated");
+        }
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalStateException("User not found");
+        }
+        String userTitle = String.valueOf(user.getTitle());
+
+        Assignment assignment = assignmentRepository.findByAssignmentId(Long.valueOf(taskId));
+        if (assignment == null) {
+            throw new IllegalArgumentException("Assignment not found");
+        }
+        String assignmentTitle = String.valueOf(assignment.getTitleLvl());
+
+        if (userTitle.equals("BEGINNER") && !assignmentTitle.equals("BEGINNER")) {
+            throw new IllegalStateException("User with title BEGINNER can only submit assignments with title BEGINNER");
+        } else if (userTitle.equals("INTERMEDIATE") && !assignmentTitle.equals("BEGINNER") && !assignmentTitle.equals("INTERMEDIATE")) {
+            throw new IllegalStateException("User with title INTERMEDIATE can only submit assignments with title BEGINNER or INTERMEDIATE");
+        }
+
+        CodeExecutionResponse grade = codeFromGuest(userCode, taskId, language);
+
+        Pattern pattern = Pattern.compile("All tests passed!");
+        Matcher matcher = pattern.matcher(grade.getOutput());
+
+        if (matcher.find()) {
+
+            Submission submission = new Submission();
+            submission.setAssignment(assignmentRepository.findByAssignmentId(Long.valueOf(taskId)));
+            submission.setUser(userRepository.findByUsername(username));
+            submission.setContent(userCode);
+            submission.setGrade(100F);
+            submission.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
+            submission.setGradedAt(new Timestamp(System.currentTimeMillis()));
+
+            submissionRepository.save(submission);
+            progressService.markLessonAsCompleted(lessonRepository.findById(assignmentRepository.findById(Long.valueOf(taskId)).get().getLesson().getLessonId()).get().getLessonId());
+        } else {
+            grade.setSuccess(false);
+            grade.setUserOutput("");
+            grade.setBuildOutput("");
+            grade.setOutput("Code submission did not pass all tests");
+        }
+        return grade;
+    }
+
+
+
     public CodeExecutionResponse codeFromGuest(String userCode, String taskId, String language){
         if ("java".equalsIgnoreCase(language)) {
             return executeJavaCode(userCode, taskId);
@@ -251,5 +319,70 @@ public class AssignmentService {
     }
     public Optional<Assignment> getAssignmentById(Long id) {
         return assignmentRepository.findById(id);
+    }
+
+    public Map<String, Object> getAllSubmissions() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new IllegalStateException("User is not authenticated");
+        }
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalStateException("User not found");
+        }
+
+        // Znajdź wszystkie kursy, lekcje i zadania, dla których użytkownik wykonał przynajmniej jedno przesłanie
+        List<Course> courses = courseRepository.findAll();
+        Map<String, Object> response = new HashMap<>();
+
+        for (Course course : courses) {
+            List<Lesson> lessons = lessonRepository.findByCourseCourseId(course.getCourseId());
+            List<Map<String, Object>> lessonsData = new ArrayList<>();
+
+            for (Lesson lesson : lessons) {
+                List<Assignment> assignments = assignmentRepository.findByLessonLessonId(lesson.getLessonId());
+                List<Map<String, Object>> assignmentsData = new ArrayList<>();
+
+                for (Assignment assignment : assignments) {
+                    // Znajdź najnowsze przesłanie dla zadania i użytkownika
+                    Submission latestSubmission = submissionRepository.findTopByUserUserIdAndAssignmentAssignmentIdOrderBySubmittedAtDesc(
+                            user.getUserId(), assignment.getAssignmentId()).orElse(null);
+
+                    // Dodaj zadanie tylko, jeśli użytkownik wykonał przesłanie
+                    if (latestSubmission != null) {
+                        Map<String, Object> assignmentData = new HashMap<>();
+                        assignmentData.put("assignmentTitle", assignment.getTitle());
+
+                        Map<String, Object> submissionData = new HashMap<>();
+                        submissionData.put("grade", latestSubmission.getGrade());
+                        submissionData.put("submittedAt", latestSubmission.getSubmittedAt());
+                        submissionData.put("content", latestSubmission.getContent());
+                        assignmentData.put("submission", submissionData);
+
+                        assignmentsData.add(assignmentData);
+                    }
+                }
+
+                // Dodaj lekcję tylko, jeśli użytkownik wykonał przynajmniej jedno zadanie w tej lekcji
+                if (!assignmentsData.isEmpty()) {
+                    Map<String, Object> lessonData = new HashMap<>();
+                    lessonData.put("lessonTitle", lesson.getTitle());
+                    lessonData.put("assignments", assignmentsData);
+                    lessonsData.add(lessonData);
+                }
+            }
+
+            // Dodaj kurs tylko, jeśli użytkownik wykonał przynajmniej jedno zadanie w tym kursie
+            if (!lessonsData.isEmpty()) {
+                Map<String, Object> courseData = new HashMap<>();
+                courseData.put("courseTitle", course.getTitle());
+                courseData.put("lessons", lessonsData);
+                response.put(course.getTitle(), courseData);
+            }
+        }
+
+        return response;
     }
 }

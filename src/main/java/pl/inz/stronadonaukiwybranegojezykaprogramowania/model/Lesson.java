@@ -32,4 +32,10 @@ public class Lesson {
     @Column(nullable = false)
     private Timestamp updatedAt;
 
+    @Column(nullable = false)
+    private Integer requiredLevel;
+
+    @Column(nullable = false)
+    private Integer lessonNumber;
+
 }

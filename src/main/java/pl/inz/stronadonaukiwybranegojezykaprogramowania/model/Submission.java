@@ -29,8 +29,6 @@ public class Submission {
 
     private Float grade;
 
-    private String feedback;
-
     @Column(nullable = false)
     private Timestamp submittedAt;
 
