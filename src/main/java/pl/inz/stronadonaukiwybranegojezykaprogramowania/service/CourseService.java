@@ -3,6 +3,7 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.CourseDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Course;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
@@ -39,7 +40,7 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public List<Course> getVisibleCoursesForUser() {
+    public List<CourseDTO> getVisibleCoursesForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new IllegalStateException("User is not authenticated");
@@ -50,34 +51,15 @@ public class CourseService {
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
+        Title userTitle = user.getTitle();
+        List<Course> allCourses = getAllCourses();
 
-        // Zwróć kursy widoczne na podstawie tytułu użytkownika
-        String userTitle = String.valueOf(user.getTitle());
-        if (userTitle.equals("BEGINNER")) {
-            return courseRepository.findByTitleLvl(Title.BEGINNER);
-        } else if (userTitle.equals("INTERMEDIATE")) {
-            return courseRepository.findByTitleLvlIn(Arrays.asList(Title.BEGINNER, Title.INTERMEDIATE));
-        } else if (userTitle.equals("ADVANCED")) {
-            return courseRepository.findAll();
-        }
-
-        return Collections.emptyList();
-    }
-    public List<Lesson> getVisibleLessonsForUser(Long courseId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new IllegalStateException("User is not authenticated");
-        }
-
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new IllegalStateException("User not found");
-        }
-
-        int userLevel = user.getLevel();
-        List<Lesson> lessons = lessonRepository.findByCourseCourseId(courseId);
-        return lessons.stream().filter(lesson -> lesson.getLessonId() <= userLevel).collect(Collectors.toList());
+        return allCourses.stream()
+                .map(course -> {
+                    boolean available = userTitle.ordinal() >= course.getTitleLvl().ordinal(); // Kurs dostępny, jeśli poziom użytkownika jest >= poziom kursu
+                    return new CourseDTO(course, available);
+                })
+                .collect(Collectors.toList());
     }
 
     public List<Course> getAllCourses() {

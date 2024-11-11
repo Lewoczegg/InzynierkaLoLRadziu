@@ -58,8 +58,6 @@ public class ProgressService {
                 return;
             }
         }
-
-        userRepository.save(user);
         Progress progress = new Progress();
         progress.setUser(user);
         progress.setCourse(course);
@@ -67,14 +65,17 @@ public class ProgressService {
         progress.setCompletedAt(new Timestamp(System.currentTimeMillis()));
         progressRepository.save(progress);
         user.setLevel(user.getLevel() + 1);
+        userRepository.save(user);
 
         long completedLessonsCount = progressRepository.countByUserUserId(user.getUserId());
         if (completedLessonsCount >= 3 && user.getLevel() < 7) {
             user.setTitle(Title.INTERMEDIATE);
+            userRepository.save(user);
         }
 
         if (user.getLevel() >= 7) {
             user.setTitle(Title.ADVANCED);
+            userRepository.save(user);
         }
     }
 }

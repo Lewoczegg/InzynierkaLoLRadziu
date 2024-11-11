@@ -6,13 +6,12 @@ import org.springframework.web.bind.annotation.*;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.AssignmentAddRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.AssignmentRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecutionResponse;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.AssignmentDTO;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.CourseDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Assignment;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.AssignmentService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/Assignment")
@@ -73,6 +72,18 @@ public class AssignmentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An unexpected error occurred"));
+        }
+    }
+
+    @GetMapping("/visible-assignments")
+    public ResponseEntity<List<AssignmentDTO>> getVisibleAssignments(){
+        try {
+            List<AssignmentDTO> courses = assignmentService.getAllAssignmentsForUser();
+            return ResponseEntity.ok(courses);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
         }
     }
 }

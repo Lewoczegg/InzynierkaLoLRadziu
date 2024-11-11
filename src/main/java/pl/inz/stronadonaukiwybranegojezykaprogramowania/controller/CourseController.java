@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.CourseDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Course;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.CourseService;
 
@@ -28,9 +29,9 @@ public class CourseController {
         return courseService.getAllCourses();
     }
     @GetMapping("/visible-courses")
-    public ResponseEntity<List<Course>> getVisibleCourses() {
+    public ResponseEntity<List<CourseDTO>> getVisibleCourses() {
         try {
-            List<Course> courses = courseService.getVisibleCoursesForUser();
+            List<CourseDTO> courses = courseService.getVisibleCoursesForUser();
             return ResponseEntity.ok(courses);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());

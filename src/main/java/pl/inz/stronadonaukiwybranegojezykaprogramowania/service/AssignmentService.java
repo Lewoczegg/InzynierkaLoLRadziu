@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecutionResponse;
 
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.AssignmentDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.*;
 
@@ -17,6 +18,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class AssignmentService {
@@ -385,4 +387,33 @@ public class AssignmentService {
 
         return response;
     }
+    public List<AssignmentDTO> getAllAssignmentsForUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new IllegalStateException("User is not authenticated");
+        }
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalStateException("User not found");
+        }
+        Title userTitle = user.getTitle();
+        int userLessonLevel = user.getLevel();
+        List<Assignment> allAssignments = assignmentRepository.findAll();
+        return allAssignments.stream()
+                .map(assignment -> {
+                    // Sprawdź poziom użytkownika względem poziomu zadania
+                    boolean isTitleLevelMatch = userTitle.ordinal() >= assignment.getTitleLvl().ordinal();
+
+                    // Sprawdź poziom użytkownika względem poziomu lekcji powiązanej z zadaniem
+                    boolean isLessonLevelMatch = userLessonLevel >= assignment.getLesson().getRequiredLevel();
+
+                    // Zadanie dostępne tylko wtedy, gdy oba warunki są spełnione
+                    boolean available = isTitleLevelMatch && isLessonLevelMatch;
+                    return new AssignmentDTO(assignment, available);
+                })
+                .collect(Collectors.toList());
+    }
+
 }

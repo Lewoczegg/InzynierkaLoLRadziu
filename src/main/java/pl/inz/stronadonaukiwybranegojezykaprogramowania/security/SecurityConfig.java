@@ -43,8 +43,11 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/**").permitAll();
                     auth.requestMatchers("/api/auth/**").permitAll();
-                    auth.requestMatchers("/Courses/all").hasAnyRole("USER", "ADMIN");
-                    auth.requestMatchers("/Lessons/all").hasAnyRole("USER", "ADMIN");
+                    auth.requestMatchers("/Courses/**").hasAnyRole("USER", "ADMIN");
+                    auth.requestMatchers("/Question/**").hasAnyRole("USER", "ADMIN");
+                    auth.requestMatchers("/Quiz/**").hasAnyRole("USER", "ADMIN");
+                    auth.requestMatchers("/QuizResult/**").hasAnyRole("USER", "ADMIN");
+                    auth.requestMatchers("/Lessons/**").hasAnyRole("USER", "ADMIN");
                     auth.requestMatchers("/Assignment/Submit").hasAnyRole("USER", "ADMIN");
                     auth.anyRequest().authenticated();
                 })

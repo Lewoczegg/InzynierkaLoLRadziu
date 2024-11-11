@@ -1,0 +1,15 @@
+package pl.inz.stronadonaukiwybranegojezykaprogramowania.repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Quiz;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.QuizResult;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+@Repository
+public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
+    Optional<QuizResult> findByUserAndCompletedAtBetween(User user, LocalDateTime start, LocalDateTime end);
+    Optional<QuizResult> findByUserAndQuiz(User user, Quiz quiz);
+}

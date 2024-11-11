@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.LessonRequest;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.LessonDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.CourseService;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.LessonService;
@@ -17,11 +18,9 @@ import java.util.Optional;
 public class LessonController {
 
     private final LessonService lessonService;
-    private final CourseService courseService;
 
-    public LessonController(LessonService lessonService, CourseService courseService) {
+    public LessonController(LessonService lessonService) {
         this.lessonService = lessonService;
-        this.courseService = courseService;
     }
 
     @PostMapping("/add")
@@ -31,9 +30,9 @@ public class LessonController {
                 lessonRequest.getCourseId());
     }
     @GetMapping("/visible-lessons")
-    public ResponseEntity<List<Lesson>> getVisibleLessons(@RequestParam Long courseId) {
+    public ResponseEntity<List<LessonDTO>> getVisibleLessons() {
         try {
-            List<Lesson> lessons = courseService.getVisibleLessonsForUser(courseId);
+            List<LessonDTO> lessons = lessonService.getVisibleLessonsForUser();
             return ResponseEntity.ok(lessons);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());

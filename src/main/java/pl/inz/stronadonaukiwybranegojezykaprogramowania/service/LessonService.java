@@ -3,6 +3,7 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.LessonDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Course;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
@@ -46,7 +47,7 @@ public class LessonService {
         return lessonRepository.save(lesson);
     }
 
-    public List<Lesson> getVisibleLessonsForUser(Long courseId) {
+    public List<LessonDTO> getVisibleLessonsForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new IllegalStateException("User is not authenticated");
@@ -58,10 +59,14 @@ public class LessonService {
             throw new IllegalStateException("User not found");
         }
 
-        // Zwróć lekcje widoczne na podstawie poziomu użytkownika
         int userLevel = user.getLevel();
-        List<Lesson> lessons = lessonRepository.findByCourseCourseId(courseId);
-        return lessons.stream().filter(lesson -> lesson.getLessonId() <= userLevel).collect(Collectors.toList());
+        List<Lesson> allLessons = getAllLessons();
+        return allLessons.stream()
+                .map(lesson -> {
+                    boolean available = userLevel >= lesson.getRequiredLevel();
+                    return new LessonDTO(lesson, available);
+                })
+                .collect(Collectors.toList());
     }
 
     // Pobieranie wszystkich lekcji
