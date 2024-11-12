@@ -15,6 +15,4 @@ public class UpdateUserRequest {
     private String surname;
     private String phoneNumber;
     private Integer age;
-
-    // Getters and setters
 }

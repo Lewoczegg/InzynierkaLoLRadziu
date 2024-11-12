@@ -26,12 +26,10 @@ public class SubmissionService {
     public Map<String, Object> findLatestSubmission(Long taskId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Sprawdzenie czy użytkownik jest uwierzytelniony
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new IllegalStateException("User is not authenticated");
         }
 
-        // Wyciągnięcie nazwy użytkownika z tokena
         String username = authentication.getName();
         Long userId = userRepository.findByUsername(username).getUserId();
         Optional<Submission> latestSubmission = submisionReposiotry.findTopByUserUserIdAndAssignmentAssignmentIdOrderBySubmittedAtDesc(userId, taskId);

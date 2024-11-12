@@ -30,8 +30,6 @@ public class LessonService {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
     }
-
-    // Tworzenie nowej lekcji
     public Lesson createLesson(String title, String content, Long courseId) {
         Optional<Course> courseOpt = courseRepository.findById(courseId);
         if (courseOpt.isEmpty()) {
@@ -40,7 +38,7 @@ public class LessonService {
         Lesson lesson = new Lesson();
         lesson.setTitle(title);
         lesson.setContent(content);
-        lesson.setCourse(courseOpt.get());  // Związanie z kursem
+        lesson.setCourse(courseOpt.get());
         lesson.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         lesson.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
@@ -69,12 +67,10 @@ public class LessonService {
                 .collect(Collectors.toList());
     }
 
-    // Pobieranie wszystkich lekcji
     public List<Lesson> getAllLessons() {
         return lessonRepository.findAll();
     }
 
-    // Pobieranie lekcji po ID
     public Optional<Lesson> getLessonById(Long id) {
         return lessonRepository.findById(id);
     }

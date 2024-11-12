@@ -33,7 +33,6 @@ public class JwtTokenProvider {
     private final SecretKey jwtSecretKey;
 
     public JwtTokenProvider() {
-        // Generowanie bezpiecznego klucza dla HS512
         this.jwtSecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
 
@@ -59,7 +58,6 @@ public class JwtTokenProvider {
     }
 
 
-    // Metoda walidująca token
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(jwtSecretKey).build().parseClaimsJws(token);
@@ -70,7 +68,6 @@ public class JwtTokenProvider {
         }
     }
 
-    // Metoda do rozwiązywania tokenu (np. z żądania HTTP)
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -79,7 +76,6 @@ public class JwtTokenProvider {
         return null;
     }
 
-    // Metoda do pobrania informacji z tokenu
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(jwtSecretKey)

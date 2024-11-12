@@ -22,7 +22,6 @@ public class QuizController {
     public ResponseEntity<?> getDailyQuiz() {
         Optional<Quiz> quiz = quizService.getDailyQuizForUser();
         if (quiz.isPresent()) {
-            // Usunięcie odpowiedzi correctAnswer przed zwróceniem quizu
             Quiz quizToReturn = quiz.get();
             quizToReturn.getQuestions().forEach(question -> question.setCorrectAnswer(null));
             return ResponseEntity.ok(quizToReturn);
@@ -31,35 +30,30 @@ public class QuizController {
         }
     }
 
-    // Endpoint do tworzenia nowego quizu z pytaniami
     @PostMapping("/create")
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz) {
         Quiz savedQuiz = quizService.createQuiz(quiz);
         return ResponseEntity.ok(savedQuiz);
     }
 
-    // Endpoint do pobrania quizu po ID
     @GetMapping("/{quizId}")
     public ResponseEntity<Quiz> getQuizById(@PathVariable Long quizId) {
         Quiz quiz = quizService.getQuizById(quizId);
         return ResponseEntity.ok(quiz);
     }
 
-    // Endpoint do pobrania wszystkich quizów
     @GetMapping("/all")
     public ResponseEntity<List<Quiz>> getAllQuizzes() {
         List<Quiz> quizzes = quizService.getAllQuizzes();
         return ResponseEntity.ok(quizzes);
     }
 
-    // Endpoint do aktualizacji istniejącego quizu
     @PutMapping("/{quizId}")
     public ResponseEntity<Quiz> updateQuiz(@PathVariable Long quizId, @RequestBody Quiz updatedQuiz) {
         Quiz savedQuiz = quizService.updateQuiz(quizId, updatedQuiz);
         return ResponseEntity.ok(savedQuiz);
     }
 
-    // Endpoint do usunięcia quizu
     @DeleteMapping("/{quizId}")
     public ResponseEntity<String> deleteQuiz(@PathVariable Long quizId) {
         quizService.deleteQuiz(quizId);

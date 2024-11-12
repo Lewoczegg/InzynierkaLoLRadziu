@@ -22,8 +22,8 @@ public class QuizResultService {
     private final QuizRepository quizRepository;
     private final UserRepository userRepository;
 
-    private static final int MAX_TIME_LIMIT = 5; // Maksymalny czas w minutach dla dodatkowych punktów
-    private static final Long BONUS_POINTS = 20L; // Liczba punktów przyznawanych za szybkie ukończenie quizu
+    private static final int MAX_TIME_LIMIT = 5;
+    private static final Long BONUS_POINTS = 20L;
 
     public QuizResultService(QuizResultRepository quizResultRepository, QuizRepository quizRepository, UserRepository userRepository) {
         this.quizResultRepository = quizResultRepository;
@@ -45,30 +45,26 @@ public class QuizResultService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz not found with id: " + quizId));
 
-        // Sprawdzenie, czy użytkownik już ukończył ten quiz
         Optional<QuizResult> existingResult = quizResultRepository.findByUserAndQuiz(user, quiz);
         if (existingResult.isPresent()) {
             throw new IllegalStateException("Ten test został zrobiony");
         }
 
-        // Sprawdzenie poprawności odpowiedzi użytkownika i przyznanie punktów
         long points = 0;
         List<Question> questions = quiz.getQuestions();
         for (int i = 0; i < questions.size(); i++) {
             Question question = questions.get(i);
             if (i < userAnswers.size() && question.getCorrectAnswer().equals(userAnswers.get(i))) {
-                points += 10; // 10 punktów za poprawną odpowiedź
+                points += 10;
             }
         }
 
         LocalDateTime completedAt = LocalDateTime.now();
 
-        // Obliczenie czasu trwania quizu
         long duration = Duration.between(startTime, completedAt).toMinutes();
 
-        // Sprawdzenie, czy quiz został ukończony w wyznaczonym czasie
         if (duration <= MAX_TIME_LIMIT) {
-            points += BONUS_POINTS;  // Dodanie dodatkowych punktów
+            points += BONUS_POINTS;
         }
 
         QuizResult quizResult = new QuizResult(user, quiz, points);

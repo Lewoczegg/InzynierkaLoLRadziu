@@ -193,7 +193,6 @@ public class AssignmentService {
             if (!Files.exists(mainFilePath)) {
                 result.setSuccess(false);
                 result.setErrorMessage("Nie znaleziono zadania o podanym ID.");
-                // Usuń katalog roboczy
                 deleteDirectory(workingDir.toFile());
                 return result;
             }
@@ -348,11 +347,9 @@ public class AssignmentService {
                 List<Map<String, Object>> assignmentsData = new ArrayList<>();
 
                 for (Assignment assignment : assignments) {
-                    // Znajdź najnowsze przesłanie dla zadania i użytkownika
                     Submission latestSubmission = submissionRepository.findTopByUserUserIdAndAssignmentAssignmentIdOrderBySubmittedAtDesc(
                             user.getUserId(), assignment.getAssignmentId()).orElse(null);
 
-                    // Dodaj zadanie tylko, jeśli użytkownik wykonał przesłanie
                     if (latestSubmission != null) {
                         Map<String, Object> assignmentData = new HashMap<>();
                         assignmentData.put("assignmentTitle", assignment.getTitle());
@@ -367,7 +364,6 @@ public class AssignmentService {
                     }
                 }
 
-                // Dodaj lekcję tylko, jeśli użytkownik wykonał przynajmniej jedno zadanie w tej lekcji
                 if (!assignmentsData.isEmpty()) {
                     Map<String, Object> lessonData = new HashMap<>();
                     lessonData.put("lessonTitle", lesson.getTitle());
@@ -376,7 +372,6 @@ public class AssignmentService {
                 }
             }
 
-            // Dodaj kurs tylko, jeśli użytkownik wykonał przynajmniej jedno zadanie w tym kursie
             if (!lessonsData.isEmpty()) {
                 Map<String, Object> courseData = new HashMap<>();
                 courseData.put("courseTitle", course.getTitle());
@@ -403,13 +398,8 @@ public class AssignmentService {
         List<Assignment> allAssignments = assignmentRepository.findAll();
         return allAssignments.stream()
                 .map(assignment -> {
-                    // Sprawdź poziom użytkownika względem poziomu zadania
                     boolean isTitleLevelMatch = userTitle.ordinal() >= assignment.getTitleLvl().ordinal();
-
-                    // Sprawdź poziom użytkownika względem poziomu lekcji powiązanej z zadaniem
                     boolean isLessonLevelMatch = userLessonLevel >= assignment.getLesson().getRequiredLevel();
-
-                    // Zadanie dostępne tylko wtedy, gdy oba warunki są spełnione
                     boolean available = isTitleLevelMatch && isLessonLevelMatch;
                     return new AssignmentDTO(assignment, available);
                 })

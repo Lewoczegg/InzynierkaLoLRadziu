@@ -28,7 +28,6 @@ public class Quiz {
         question.setQuiz(this);
     }
 
-    // Metoda pomocnicza do usuwania pytania z quizu
     public void removeQuestion(Question question) {
         questions.remove(question);
         question.setQuiz(null);

@@ -27,7 +27,6 @@ public class QuizService {
         this.userRepository = userRepository;
     }
     public Optional<Quiz> getDailyQuizForUser() {
-        // Pobierz bieżącego użytkownika z kontekstu bezpieczeństwa
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
@@ -39,7 +38,6 @@ public class QuizService {
             throw new IllegalStateException("User not found");
         }
 
-        // Sprawdzenie, czy użytkownik rozwiązał już dzisiejszy quiz
         LocalDate today = LocalDate.now();
         boolean hasCompletedToday = quizResultRepository
                 .findByUserAndCompletedAtBetween(user, today.atStartOfDay(), today.plusDays(1).atStartOfDay())
@@ -49,23 +47,20 @@ public class QuizService {
             return Optional.empty();
         }
 
-        // Pobranie quizów, których użytkownik jeszcze nie rozwiązał
         List<Quiz> availableQuizzes = quizRepository.findAllNotCompletedByUser(user.getUserId());
 
         if (availableQuizzes.isEmpty()) {
             return Optional.empty();
         }
 
-        // Losowe przypisanie quizu
         Random random = new Random();
         Quiz randomQuiz = availableQuizzes.get(random.nextInt(availableQuizzes.size()));
         return Optional.of(randomQuiz);
     }
     public Quiz createQuiz(Quiz quiz) {
-        // Ustawianie quizu dla każdego pytania
         if (quiz.getQuestions() != null) {
             for (Question question : quiz.getQuestions()) {
-                question.setQuiz(quiz); // Ustawianie relacji pytania z quizem
+                question.setQuiz(quiz);
             }
         }
         return quizRepository.save(quiz);
@@ -85,11 +80,10 @@ public class QuizService {
                 .orElseThrow(() -> new RuntimeException("Quiz not found with id: " + quizId));
         existingQuiz.setTitle(updatedQuiz.getTitle());
 
-        // Czyścimy istniejące pytania i dodajemy nowe
         existingQuiz.getQuestions().clear();
         if (updatedQuiz.getQuestions() != null) {
             for (Question question : updatedQuiz.getQuestions()) {
-                existingQuiz.addQuestion(question); // Dodawanie pytań do istniejącego quizu
+                existingQuiz.addQuestion(question);
             }
         }
         return quizRepository.save(existingQuiz);
