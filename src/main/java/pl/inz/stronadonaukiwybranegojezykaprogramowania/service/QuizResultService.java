@@ -12,7 +12,9 @@ import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepositor
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -72,5 +74,18 @@ public class QuizResultService {
 
         return quizResultRepository.save(quizResult);
     }
+    public Map<String, Long> getTotalPointsForAllUsers() {
+        List<Object[]> results = quizResultRepository.findTotalPointsForAllUsers();
+        Map<String, Long> userPointsMap = new HashMap<>();
+
+        for (Object[] result : results) {
+            String username = (String) result[0];
+            Long totalPoints = ((Number) result[1]).longValue();
+            userPointsMap.put(username, totalPoints);
+        }
+
+        return userPointsMap;
+    }
+
 }
 

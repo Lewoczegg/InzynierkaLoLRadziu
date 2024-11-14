@@ -10,6 +10,7 @@ import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.QuizResultServic
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/QuizResult")
@@ -31,5 +32,11 @@ public class QuizResultController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/total-points")
+    public ResponseEntity<Map<String, Long>> getTotalPointsForAllUsers() {
+        Map<String, Long> userPointsMap = quizResultService.getTotalPointsForAllUsers();
+        return ResponseEntity.ok(userPointsMap);
     }
 }
