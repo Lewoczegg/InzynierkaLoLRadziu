@@ -30,10 +30,11 @@ public class CourseService {
         this.lessonRepository = lessonRepository;
     }
 
-    public Course createCourse(String title, String description) {
+    public Course createCourse(String title, String description, Title titleLvl) {
         Course course = new Course();
         course.setTitle(title);
         course.setDescription(description);
+        course.setTitleLvl(titleLvl);
         course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 

@@ -27,7 +27,9 @@ public class LessonController {
     public Lesson createLesson(@RequestBody LessonRequest lessonRequest) {
         return lessonService.createLesson(lessonRequest.getTitle(),
                 lessonRequest.getContent(),
-                lessonRequest.getCourseId());
+                lessonRequest.getCourseId(),
+                lessonRequest.getLessonNumber(),
+                lessonRequest.getRequiredLevel());
     }
     @GetMapping("/visible-lessons")
     public ResponseEntity<List<LessonDTO>> getVisibleLessons() {

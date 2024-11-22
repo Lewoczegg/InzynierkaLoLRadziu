@@ -1,10 +1,13 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.DailyTask;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.DailyTaskAssignment;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.DailyTaskAssignmentRepository;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.DailyTaskRepository;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.DailyTaskResultRepository;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
@@ -20,11 +23,12 @@ public class DailyTaskService {
     private final DailyTaskRepository dailyTaskRepository;
     private final UserRepository userRepository;
     private final DailyTaskResultRepository dailyTaskResultRepository;
-
-    public DailyTaskService(DailyTaskRepository dailyTaskRepository, UserRepository userRepository, DailyTaskResultRepository dailyTaskResultRepository) {
+    private final DailyTaskAssignmentRepository dailyTaskAssignmentRepository;
+    public DailyTaskService(DailyTaskRepository dailyTaskRepository, UserRepository userRepository, DailyTaskResultRepository dailyTaskResultRepository, DailyTaskAssignmentRepository dailyTaskAssignmentRepository) {
         this.dailyTaskRepository = dailyTaskRepository;
         this.userRepository = userRepository;
         this.dailyTaskResultRepository = dailyTaskResultRepository;
+        this.dailyTaskAssignmentRepository = dailyTaskAssignmentRepository;
     }
 
     public DailyTask createDailyTask(DailyTask dailyTask) {
@@ -53,8 +57,8 @@ public class DailyTaskService {
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
         dailyTaskRepository.delete(dailyTask);
     }
-
-    public Optional<DailyTask> getDailyTaskForUser() {
+    @Transactional
+    public synchronized Optional<DailyTask> getDailyTaskForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
@@ -68,14 +72,22 @@ public class DailyTaskService {
         }
 
         LocalDate today = LocalDate.now();
+
         boolean hasCompletedToday = dailyTaskResultRepository
                 .findByUserAndCompletedAtBetween(user, today.atStartOfDay(), today.plusDays(1).atStartOfDay())
                 .isPresent();
-
         if (hasCompletedToday) {
             return Optional.empty();
         }
 
+        // Sprawdzenie, czy użytkownik już ma przypisane zadanie na dzisiaj
+        Optional<DailyTaskAssignment> existingAssignment = dailyTaskAssignmentRepository.findByUserAndAssignmentDate(user, today);
+        if (existingAssignment.isPresent()) {
+            return Optional.of(existingAssignment.get().getDailyTask());
+        }
+
+
+        // Jeśli brak przypisanego zadania, losujemy nowe zadanie
         List<DailyTask> availableTasks = dailyTaskRepository.findAllNotCompletedByUser(user.getUserId());
 
         if (availableTasks.isEmpty()) {
@@ -84,7 +96,13 @@ public class DailyTaskService {
 
         Random random = new Random();
         DailyTask randomTask = availableTasks.get(random.nextInt(availableTasks.size()));
+
+        // Zapisujemy nowe przypisanie zadania dla użytkownika
+        DailyTaskAssignment newAssignment = new DailyTaskAssignment();
+        newAssignment.setUser(user);
+        newAssignment.setDailyTask(randomTask);
+        newAssignment.setAssignmentDate(today);
+        dailyTaskAssignmentRepository.save(newAssignment);
         return Optional.of(randomTask);
     }
-
 }

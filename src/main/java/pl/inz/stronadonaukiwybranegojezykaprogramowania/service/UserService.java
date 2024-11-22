@@ -36,6 +36,7 @@ public class UserService {
         response.put("surname", user.getSurname());
         response.put("age", user.getAge());
         response.put("title", user.getTitle());
+        response.put("level", user.getLevel());
 
         return response;
     }

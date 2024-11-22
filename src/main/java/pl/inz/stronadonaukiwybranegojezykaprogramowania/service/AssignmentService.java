@@ -1,9 +1,11 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.stereotype.Service;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.AssignmentResponse;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecutionResponse;
 
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.AssignmentDTO;
@@ -112,9 +114,11 @@ public class AssignmentService {
         try {
             Files.createDirectories(workingDir);
 
+            // Zapisz kod użytkownika w pliku user_code.py
             Path userCodePath = workingDir.resolve("user_code.py");
             Files.writeString(userCodePath, userCode);
 
+            // Sprawdź, czy plik testowy istnieje
             String testFileName = "task" + taskId + ".py";
             Path testFilePath = Paths.get("src/scripts/python_tasks/" + testFileName);
 
@@ -125,9 +129,21 @@ public class AssignmentService {
                 return result;
             }
 
+            // Skopiuj plik testowy do katalogu roboczego
             Path copiedTestFilePath = workingDir.resolve(testFileName);
             Files.copy(testFilePath, copiedTestFilePath, StandardCopyOption.REPLACE_EXISTING);
 
+            // Skopiuj plik taskexecutor.py do katalogu roboczego
+            Path taskExecutorPath = Paths.get("src/scripts/python_tasks/TaskExecutor.py");
+            Path copiedTaskExecutorPath = workingDir.resolve("TaskExecutor.py");
+            Files.copy(taskExecutorPath, copiedTaskExecutorPath, StandardCopyOption.REPLACE_EXISTING);
+
+            // Dodaj import do kodu użytkownika w pliku testowym
+            String testFileContent = Files.readString(copiedTestFilePath);
+            String updatedTestFileContent = "import user_code\n" + testFileContent;
+            Files.writeString(copiedTestFilePath, updatedTestFileContent);
+
+            // Uruchomienie zadania w kontenerze Docker
             String runCommand = "python " + testFileName;
             String[] runCmd = {
                     "docker", "run", "--rm",
@@ -155,6 +171,7 @@ public class AssignmentService {
                 return result;
             }
 
+            // Pobierz wynik przechwyconego wyjścia użytkownika
             Path userOutputPath = workingDir.resolve("user_output.txt");
             if (Files.exists(userOutputPath)) {
                 String userOutput = Files.readString(userOutputPath);
@@ -165,6 +182,7 @@ public class AssignmentService {
 
             result.setSuccess(true);
 
+            // Usuń katalog roboczy
             deleteDirectory(workingDir.toFile());
 
         } catch (IOException | InterruptedException e) {
@@ -174,6 +192,7 @@ public class AssignmentService {
 
         return result;
     }
+
 
     public CodeExecutionResponse executeJavaCode(String userCode, String taskId){
         CodeExecutionResponse result = new CodeExecutionResponse();
@@ -188,7 +207,7 @@ public class AssignmentService {
             Files.writeString(resultFilePath, userCode);
 
             String mainFileName = "Task" + taskId + "Main.java";
-            Path mainFilePath = Paths.get("src/scripts/java_tasks/"  + mainFileName);
+            Path mainFilePath = Paths.get("src/scripts/java_tasks/" + mainFileName);
 
             if (!Files.exists(mainFilePath)) {
                 result.setSuccess(false);
@@ -197,10 +216,22 @@ public class AssignmentService {
                 return result;
             }
 
+            // Skopiuj plik TaskExecutor.java do katalogu roboczego
+            Path executorFilePath = Paths.get("src/scripts/java_tasks/TaskExecutor.java");
+            if (Files.exists(executorFilePath)) {
+                Path combinedExecutorFilePath = workingDir.resolve("TaskExecutor.java");
+                Files.copy(executorFilePath, combinedExecutorFilePath, StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                result.setSuccess(false);
+                result.setErrorMessage("Nie znaleziono klasy TaskExecutor.");
+                deleteDirectory(workingDir.toFile());
+                return result;
+            }
+
             Path combinedMainFilePath = workingDir.resolve(mainFileName);
             Files.copy(mainFilePath, combinedMainFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            String compileCommand = "javac Result.java " + mainFileName;
+            String compileCommand = "javac Result.java TaskExecutor.java " + mainFileName;
             String[] compileCmd = {
                     "docker", "run", "--rm",
                     "-v", workingDir.toAbsolutePath() + ":/app",
@@ -300,7 +331,7 @@ public class AssignmentService {
         return output.toString();
     }
 
-    public Assignment createAssignment(String title, String description, Long lessonId) {
+    public Assignment createAssignment(String title, String description, Long lessonId, Title titleLvl) {
         Optional<Lesson> lessonOpt = lessonRepository.findById(lessonId);
         if (lessonOpt.isEmpty()){
             throw new RuntimeException("Lesson not found");
@@ -309,6 +340,7 @@ public class AssignmentService {
         assignment.setTitle(title);
         assignment.setDescription(description);
         assignment.setLesson(lessonOpt.get());
+        assignment.setTitleLvl(titleLvl);
         assignment.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         assignment.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
@@ -318,8 +350,29 @@ public class AssignmentService {
     public List<Assignment> getAllAssignments() {
         return assignmentRepository.findAll();
     }
-    public Optional<Assignment> getAssignmentById(Long id) {
-        return assignmentRepository.findById(id);
+    public Optional<AssignmentResponse> getAssignmentById(Long id) {
+        // Pobierz obiekt Authentication z SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new IllegalStateException("User is not authenticated");
+        }
+
+        // Pobierz nazwe użytkownika
+        String username = authentication.getName();
+
+        // Pobierz role użytkownika
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String roles = authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(", "));
+
+
+        // Znajdź Assignment na podstawie id
+        Optional<Assignment> assignmentOptional = assignmentRepository.findById(id);
+
+        // Jeśli Assignment istnieje, zwróć AssignmentResponse, jeśli nie - zwróć Optional.empty()
+        return assignmentOptional.map(assignment -> new AssignmentResponse(assignment, roles));
     }
 
     public Map<String, Object> getAllSubmissions() {
@@ -404,6 +457,18 @@ public class AssignmentService {
                     return new AssignmentDTO(assignment, available);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public Optional<Assignment> updateAssignment(Long id, Assignment updatedAssignment) {
+        return assignmentRepository.findById(id).map(existingAssignment -> {
+            existingAssignment.setTitle(updatedAssignment.getTitle());
+            existingAssignment.setDescription(updatedAssignment.getDescription());
+            existingAssignment.setLesson(updatedAssignment.getLesson());
+            existingAssignment.setTitleLvl(updatedAssignment.getTitleLvl());
+            existingAssignment.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            existingAssignment.setCreatedAt(existingAssignment.getCreatedAt());
+            return assignmentRepository.save(existingAssignment);
+        });
     }
 
 }

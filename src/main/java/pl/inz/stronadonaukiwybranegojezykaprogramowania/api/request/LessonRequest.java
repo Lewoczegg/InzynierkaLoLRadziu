@@ -11,4 +11,6 @@ public class LessonRequest {
     private String title;
     private String content;
     private Long courseId;
+    private Integer requiredLevel;
+    private Integer lessonNumber;
 }

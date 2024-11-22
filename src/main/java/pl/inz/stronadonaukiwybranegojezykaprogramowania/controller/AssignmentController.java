@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.AssignmentAddRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.AssignmentRequest;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.AssignmentResponse;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecutionResponse;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.AssignmentDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.CourseDTO;
@@ -51,7 +52,8 @@ public class AssignmentController {
     public Assignment createLesson(@RequestBody AssignmentAddRequest assignmentAddRequest) {
         return assignmentService.createAssignment(assignmentAddRequest.getTitle(),
                 assignmentAddRequest.getContent(),
-                assignmentAddRequest.getLessonId());
+                assignmentAddRequest.getLessonId(),
+                assignmentAddRequest.getTitleLvl());
     }
 
     @GetMapping("/all")
@@ -60,8 +62,9 @@ public class AssignmentController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Assignment> getAssignmentById(@PathVariable Long id) {
-        return assignmentService.getAssignmentById(id);
+    public ResponseEntity<AssignmentResponse> getAssignmentById(@PathVariable Long id) {
+        Optional<AssignmentResponse> responseOptional = assignmentService.getAssignmentById(id);
+        return responseOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
     @GetMapping("/all-submissions")
     public ResponseEntity<Map<String, Object>> getAllSubmissions(@RequestHeader("Authorization") String token) {
@@ -85,5 +88,11 @@ public class AssignmentController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
         }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Assignment> updateAssignment(@PathVariable Long id, @RequestBody Assignment updatedAssignment) {
+        Optional<Assignment> assignment = assignmentService.updateAssignment(id, updatedAssignment);
+        return assignment.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

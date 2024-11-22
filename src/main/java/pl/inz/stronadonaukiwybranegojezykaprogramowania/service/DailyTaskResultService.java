@@ -79,9 +79,16 @@ public class DailyTaskResultService {
             points += 10;
             LocalDateTime completedAt = LocalDateTime.now();
             long duration = Duration.between(startTime, completedAt).toMinutes();
+            System.out.println(startTime);
+            System.out.println(completedAt);
+            System.out.println(duration);
             if (duration <= MAX_TIME_LIMIT) {
                 points += BONUS_POINTS;
+                System.out.println(points);
+                System.out.println("IN");
             }
+            System.out.println(points);
+            System.out.println("AFTER");
             DailyTaskResult dailyTaskResult = new DailyTaskResult(user, dailyTask, points);
             dailyTaskResult.setCompletedAt(completedAt);
             dailyTaskResultRepository.save(dailyTaskResult);

@@ -1,57 +1,21 @@
-import sys
-import io
+test_inputs = [
+    (3, 5),
+    (-2, 7),
+    (0, 0),
+    (10, -10),
+    (100, 200)
+]
 
-def main():
-    test_inputs = ["hello", "world", "OpenAI", "Python", ""]
-    expected_outputs = ["olleh", "dlrow", "IAnepO", "nohtyP", ""]
-
-    all_tests_passed = True
-
-    # Przechwyć wyjście użytkownika podczas pierwszego wywołania
-    user_output = io.StringIO()
-    original_stdout = sys.stdout
-    sys.stdout = user_output
-
-    # Importuj kod użytkownika
-    from user_code import reverse_string
-
-    # Wywołaj funkcję użytkownika raz, aby przechwycić wyjście
-    reverse_string(test_inputs[0])
-
-    # Przywróć stdout
-    sys.stdout = original_stdout
-
-    # Zapisz wyjście użytkownika do pliku
-    with open('user_output.txt', 'w') as f:
-        f.write(user_output.getvalue())
-
-    # Wykonaj testy, ignorując wyjście użytkownika
-    for i, input_str in enumerate(test_inputs):
-        expected = expected_outputs[i]
-
-        # Ignoruj wyjście użytkownika podczas testów
-        sys.stdout = open('/dev/null', 'w')
-
-        try:
-            result = reverse_string(input_str)
-        except Exception as e:
-            sys.stdout = original_stdout
-            print(f"Test failed for input: '{input_str}'. Exception occurred: {e}")
-            all_tests_passed = False
-            continue
-
-        sys.stdout = original_stdout
-
-        if result == expected:
-            print(f"Test passed for input: '{input_str}'")
-        else:
-            print(f"Test failed for input: '{input_str}'. Expected: '{expected}', but got: '{result}'")
-            all_tests_passed = False
-
-    if all_tests_passed:
-        print("All tests passed!")
-    else:
-        print("Some tests failed.")
+expected_outputs = [
+    8,
+    5,
+    0,
+    0,
+    300
+]
 
 if __name__ == "__main__":
-    main()
+    import TaskExecutor
+    from user_code import result
+
+    TaskExecutor.run_tests(test_inputs, expected_outputs, lambda inputs: result(*inputs))

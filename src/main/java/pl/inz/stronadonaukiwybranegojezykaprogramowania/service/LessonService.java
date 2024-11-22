@@ -30,7 +30,7 @@ public class LessonService {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
     }
-    public Lesson createLesson(String title, String content, Long courseId) {
+    public Lesson createLesson(String title, String content, Long courseId, Integer lessonNumber, Integer requiredLevel) {
         Optional<Course> courseOpt = courseRepository.findById(courseId);
         if (courseOpt.isEmpty()) {
             throw new RuntimeException("Course not found");
@@ -39,6 +39,8 @@ public class LessonService {
         lesson.setTitle(title);
         lesson.setContent(content);
         lesson.setCourse(courseOpt.get());
+        lesson.setLessonNumber(lessonNumber);
+        lesson.setRequiredLevel(requiredLevel);
         lesson.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         lesson.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 

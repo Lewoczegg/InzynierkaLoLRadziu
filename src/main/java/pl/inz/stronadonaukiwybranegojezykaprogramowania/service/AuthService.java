@@ -40,7 +40,6 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
-        System.out.println("XDDlol");
         return jwtTokenProvider.generateToken(authentication);
     }
 

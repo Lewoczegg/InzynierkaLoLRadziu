@@ -21,7 +21,7 @@ public class CourseController {
 
     @PostMapping("/add")
     public Course createCourse(@RequestBody Course course) {
-        return courseService.createCourse(course.getTitle(), course.getDescription());
+        return courseService.createCourse(course.getTitle(), course.getDescription(), course.getTitleLvl());
     }
 
     @GetMapping("/all")
