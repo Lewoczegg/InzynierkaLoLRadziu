@@ -91,8 +91,6 @@ public class AssignmentService {
         return grade;
     }
 
-
-
     public CodeExecutionResponse codeFromGuest(String userCode, String taskId, String language){
         if ("java".equalsIgnoreCase(language)) {
             return executeJavaCode(userCode, taskId);
@@ -108,17 +106,15 @@ public class AssignmentService {
     public CodeExecutionResponse executePythonCode(String userCode, String taskId) {
         CodeExecutionResponse result = new CodeExecutionResponse();
         String uniqueId = UUID.randomUUID().toString();
-        String workingDirPath = "/path/to/temp/" + uniqueId;
+        String workingDirPath = "/tmp/" + uniqueId;
         Path workingDir = Paths.get(workingDirPath);
 
         try {
             Files.createDirectories(workingDir);
 
-            // Zapisz kod użytkownika w pliku user_code.py
             Path userCodePath = workingDir.resolve("user_code.py");
             Files.writeString(userCodePath, userCode);
 
-            // Sprawdź, czy plik testowy istnieje
             String testFileName = "task" + taskId + ".py";
             Path testFilePath = Paths.get("src/scripts/python_tasks/" + testFileName);
 
@@ -129,21 +125,17 @@ public class AssignmentService {
                 return result;
             }
 
-            // Skopiuj plik testowy do katalogu roboczego
             Path copiedTestFilePath = workingDir.resolve(testFileName);
             Files.copy(testFilePath, copiedTestFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Skopiuj plik taskexecutor.py do katalogu roboczego
             Path taskExecutorPath = Paths.get("src/scripts/python_tasks/TaskExecutor.py");
             Path copiedTaskExecutorPath = workingDir.resolve("TaskExecutor.py");
             Files.copy(taskExecutorPath, copiedTaskExecutorPath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Dodaj import do kodu użytkownika w pliku testowym
             String testFileContent = Files.readString(copiedTestFilePath);
             String updatedTestFileContent = "import user_code\n" + testFileContent;
             Files.writeString(copiedTestFilePath, updatedTestFileContent);
 
-            // Uruchomienie zadania w kontenerze Docker
             String runCommand = "python " + testFileName;
             String[] runCmd = {
                     "docker", "run", "--rm",
@@ -171,7 +163,6 @@ public class AssignmentService {
                 return result;
             }
 
-            // Pobierz wynik przechwyconego wyjścia użytkownika
             Path userOutputPath = workingDir.resolve("user_output.txt");
             if (Files.exists(userOutputPath)) {
                 String userOutput = Files.readString(userOutputPath);
@@ -182,7 +173,6 @@ public class AssignmentService {
 
             result.setSuccess(true);
 
-            // Usuń katalog roboczy
             deleteDirectory(workingDir.toFile());
 
         } catch (IOException | InterruptedException e) {
@@ -216,7 +206,6 @@ public class AssignmentService {
                 return result;
             }
 
-            // Skopiuj plik TaskExecutor.java do katalogu roboczego
             Path executorFilePath = Paths.get("src/scripts/java_tasks/TaskExecutor.java");
             if (Files.exists(executorFilePath)) {
                 Path combinedExecutorFilePath = workingDir.resolve("TaskExecutor.java");
@@ -280,6 +269,7 @@ public class AssignmentService {
 
             if (runExitCode != 0) {
                 result.setSuccess(false);
+                result.setOutput(errorOutput);
                 result.setErrorMessage("Wykonanie kodu nie powiodło się.");
                 deleteDirectory(workingDir.toFile());
                 return result;
@@ -357,21 +347,15 @@ public class AssignmentService {
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new IllegalStateException("User is not authenticated");
         }
-
-        // Pobierz nazwe użytkownika
         String username = authentication.getName();
 
-        // Pobierz role użytkownika
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String roles = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(", "));
 
-
-        // Znajdź Assignment na podstawie id
         Optional<Assignment> assignmentOptional = assignmentRepository.findById(id);
 
-        // Jeśli Assignment istnieje, zwróć AssignmentResponse, jeśli nie - zwróć Optional.empty()
         return assignmentOptional.map(assignment -> new AssignmentResponse(assignment, roles));
     }
 
@@ -387,7 +371,6 @@ public class AssignmentService {
             throw new IllegalStateException("User not found");
         }
 
-        // Znajdź wszystkie kursy, lekcje i zadania, dla których użytkownik wykonał przynajmniej jedno przesłanie
         List<Course> courses = courseRepository.findAll();
         Map<String, Object> response = new HashMap<>();
 

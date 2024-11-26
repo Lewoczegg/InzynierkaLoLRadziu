@@ -15,8 +15,6 @@ public class Task12Main {
                 42,
                 400
         };
-
-        // Użycie TaskExecutor do przeprowadzenia testów
         TaskExecutor.executeTest(inputs, expectedResults, Result::findLargestElement);
     }
 }

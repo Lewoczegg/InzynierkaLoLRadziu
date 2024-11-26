@@ -14,7 +14,6 @@ public class TaskDaily2Main {
                 "Test"
         };
 
-        // Określenie typów dla metody executeTest, aby uniknąć niejednoznaczności
         TaskExecutor.<String[], String>executeTest(inputs, expectedResults, (input) -> Result.concatenateStrings(input[0], input[1]));
     }
 }

@@ -61,7 +61,6 @@ public class DailyTaskResultService {
         if (existingResult.isPresent()) {
             System.out.println("This task has already been completed");
 
-            // Stworzenie nowego obiektu CodeExecutionResponse i ustawienie odpowiedniego pola
             CodeExecutionResponse response = new CodeExecutionResponse();
             response.setOutput("Task has already been completed");
 
@@ -97,7 +96,6 @@ public class DailyTaskResultService {
 
         return grade;
     }
-
     public Map<String, Long> getTotalPointsForAllUsers() {
         List<Object[]> results = dailyTaskResultRepository.findTotalPointsForAllUsers();
         Map<String, Long> userPointsMap = new HashMap<>();

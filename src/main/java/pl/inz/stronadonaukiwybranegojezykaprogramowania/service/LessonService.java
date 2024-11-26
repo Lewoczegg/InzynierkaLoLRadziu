@@ -18,10 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class LessonService {
-
-
     private final LessonRepository lessonRepository;
-
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
 

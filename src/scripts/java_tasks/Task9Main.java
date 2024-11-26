@@ -15,8 +15,6 @@ public class Task9Main {
                 "-1 is greater than -5",
                 "6 is not greater than 6"
         };
-
-        // Użycie TaskExecutor do przeprowadzenia testów
         TaskExecutor.executeTest(inputs, expectedResults, Result::compareTwoNumbers);
     }
 }

@@ -6,7 +6,6 @@ import java.util.*;
 
 public class Task27Main {
     public static void main(String[] args) {
-        // Testowanie klasy Result za pomocą TaskExecutor
         List<String> operations = Arrays.asList("insert 5", "insert 3", "insert 7", "insert 1", "insert 4", "in_order", "pre_order", "post_order", "find 5", "find 8");
         List<String> expectedResults = Arrays.asList("N/A", "N/A", "N/A", "N/A", "N/A", "[1, 3, 4, 5, 7]", "[5, 3, 1, 4, 7]", "[1, 4, 3, 7, 5]", "true", "false");
 
@@ -14,7 +13,6 @@ public class Task27Main {
     }
     public static void executeTestBinaryTree(String[] operations, String[] expectedResults, BinaryTree tree) {
         try {
-            // Przygotowanie funkcji do wykonania operacji
             Function<String, String> wrappedFunction = operation -> {
                 try {
                     String[] parts = operation.split(" ");
@@ -40,7 +38,6 @@ public class Task27Main {
                 }
             };
 
-            // Wykonanie testów
             TaskExecutor.executeTestBase(operations, expectedResults, wrappedFunction);
 
         } catch (Exception e) {

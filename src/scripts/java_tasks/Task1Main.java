@@ -12,7 +12,7 @@ public class Task1Main {
                 100
         };
 
-        // Użycie TaskExecutor do przeprowadzenia testów
+
         TaskExecutor.executeTest(inputs, expectedResults, Result::defineInteger);
     }
 }

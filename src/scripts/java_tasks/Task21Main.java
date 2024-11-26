@@ -4,7 +4,6 @@ import java.util.function.Consumer;
 
 public class Task21Main {
     public static void main(String[] args) {
-        // Testowanie metody towerOfHanoi za pomocą TaskExecutor
         Integer[] inputs = {2, 3};
         String[] expectedResults = {
                 "Move disk from A to BMove disk from A to CMove disk from B to C",

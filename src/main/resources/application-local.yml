@@ -1,0 +1,32 @@
+jwt:
+  expirationMs: 86400000
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+  application:
+    name: StronaDoNaukiWybranegoJezykaProgramowania (Local)
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/codeseries
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  ai:
+    ollama:
+      base-url: http://localhost:11434/
+      model: codellama
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG

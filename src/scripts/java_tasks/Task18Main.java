@@ -3,7 +3,6 @@ import java.util.*;
 
 public class Task18Main {
     public static void main(String[] args) {
-        // Testowanie metody factorial za pomocą TaskExecutor
         Integer[] inputs = {5, 0, 3, 7, 10};
         Integer[] expectedResults = {120, 1, 6, 5040, 3628800};
 

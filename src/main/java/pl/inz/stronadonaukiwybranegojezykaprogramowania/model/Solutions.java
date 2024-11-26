@@ -19,7 +19,8 @@ public class Solutions {
     @JoinColumn(name = "assignment_id", nullable = false)
     private Assignment assignment;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
+    @Lob
     private String content;
 
     @Column(nullable = false)

@@ -16,7 +16,6 @@ public class Task4Main {
                 300.0
         };
 
-        // Użycie TaskExecutor do przeprowadzenia testów
         TaskExecutor.executeTest(inputs, expectedResults, Result::addTwoNumbers);
     }
 }

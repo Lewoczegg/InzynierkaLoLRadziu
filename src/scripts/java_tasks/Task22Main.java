@@ -3,7 +3,6 @@ import java.util.*;
 
 public class Task22Main {
     public static void main(String[] args) {
-        // Testowanie metody bubbleSort za pomocą TaskExecutor
         List<List<Integer>> inputs = Arrays.asList(
                 Arrays.asList(5, 3, 8, 6, 2),
                 Arrays.asList(1, 4, 3, 2),

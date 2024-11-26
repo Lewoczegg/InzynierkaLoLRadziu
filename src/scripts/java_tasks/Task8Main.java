@@ -16,7 +16,6 @@ public class Task8Main {
                 "-1 is not positive"
         };
 
-        // Użycie TaskExecutor do przeprowadzenia testów
         TaskExecutor.<Integer, String>executeTest(inputs, expectedResults, Result::checkIfPositive);
     }
 }

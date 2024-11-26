@@ -12,5 +12,4 @@ import java.util.List;
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByTitleLvl(Title title);
     List<Course> findByTitleLvlIn(Collection<Title> titles);
-//    List<Course> findAll();
 }

@@ -16,7 +16,6 @@ public class Task6Main {
                 17
         };
 
-        // Użycie TaskExecutor do przeprowadzenia testów
         TaskExecutor.executeTest(inputs, expectedResults, Result::divideAndRound);
     }
 }

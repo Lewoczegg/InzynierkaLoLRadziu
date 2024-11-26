@@ -80,14 +80,11 @@ public class DailyTaskService {
             return Optional.empty();
         }
 
-        // Sprawdzenie, czy użytkownik już ma przypisane zadanie na dzisiaj
         Optional<DailyTaskAssignment> existingAssignment = dailyTaskAssignmentRepository.findByUserAndAssignmentDate(user, today);
         if (existingAssignment.isPresent()) {
             return Optional.of(existingAssignment.get().getDailyTask());
         }
 
-
-        // Jeśli brak przypisanego zadania, losujemy nowe zadanie
         List<DailyTask> availableTasks = dailyTaskRepository.findAllNotCompletedByUser(user.getUserId());
 
         if (availableTasks.isEmpty()) {
@@ -97,7 +94,6 @@ public class DailyTaskService {
         Random random = new Random();
         DailyTask randomTask = availableTasks.get(random.nextInt(availableTasks.size()));
 
-        // Zapisujemy nowe przypisanie zadania dla użytkownika
         DailyTaskAssignment newAssignment = new DailyTaskAssignment();
         newAssignment.setUser(user);
         newAssignment.setDailyTask(randomTask);

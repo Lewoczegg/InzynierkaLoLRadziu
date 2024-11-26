@@ -16,7 +16,6 @@ public class Task5Main {
                 50.0
         };
 
-        // Użycie TaskExecutor do przeprowadzenia testów dla funkcji dwóch argumentów
         TaskExecutor.executeTest(inputs, expectedResults, Result::multiplyTwoNumbers);
     }
 }

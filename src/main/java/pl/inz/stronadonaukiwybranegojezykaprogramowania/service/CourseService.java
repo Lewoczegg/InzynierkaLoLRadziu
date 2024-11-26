@@ -23,11 +23,9 @@ import java.util.stream.Collectors;
 public class CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
-    private final LessonRepository lessonRepository;
-    public CourseService(CourseRepository courseRepository, UserRepository userRepository, LessonRepository lessonRepository) {
+    public CourseService(CourseRepository courseRepository, UserRepository userRepository) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
-        this.lessonRepository = lessonRepository;
     }
 
     public Course createCourse(String title, String description, Title titleLvl) {
@@ -57,7 +55,7 @@ public class CourseService {
 
         return allCourses.stream()
                 .map(course -> {
-                    boolean available = userTitle.ordinal() >= course.getTitleLvl().ordinal(); // Kurs dostępny, jeśli poziom użytkownika jest >= poziom kursu
+                    boolean available = userTitle.ordinal() >= course.getTitleLvl().ordinal();
                     return new CourseDTO(course, available);
                 })
                 .collect(Collectors.toList());

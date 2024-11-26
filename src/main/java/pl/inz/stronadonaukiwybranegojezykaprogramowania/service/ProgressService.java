@@ -18,16 +18,14 @@ public class ProgressService {
     private final UserRepository userRepository;
     private final LessonRepository lessonRepository;
     private final AssignmentRepository assignmentRepository;
-    private final SolutionsRepository solutionsRepository;
     private final SubmissionRepository submissionRepository;
     private final CourseRepository courseRepository;
 
-    public ProgressService(ProgressRepository progressRepository, UserRepository userRepository, LessonRepository lessonRepository, AssignmentRepository assignmentRepository, SolutionsRepository solutionsRepository, SubmissionRepository submissionRepository, CourseRepository courseRepository) {
+    public ProgressService(ProgressRepository progressRepository, UserRepository userRepository, LessonRepository lessonRepository, AssignmentRepository assignmentRepository, SubmissionRepository submissionRepository, CourseRepository courseRepository) {
         this.progressRepository = progressRepository;
         this.userRepository = userRepository;
         this.lessonRepository = lessonRepository;
         this.assignmentRepository = assignmentRepository;
-        this.solutionsRepository = solutionsRepository;
         this.submissionRepository = submissionRepository;
         this.courseRepository = courseRepository;
     }

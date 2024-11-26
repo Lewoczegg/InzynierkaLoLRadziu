@@ -32,7 +32,6 @@ public class VideoMetadataService {
         }
 
         try {
-            // Zapisz plik na dysku (np. w katalogu "uploads")
             File directory = new File(fileStorageLocation.toString());
             if (!directory.exists()) {
                 directory.mkdirs();
@@ -42,7 +41,6 @@ public class VideoMetadataService {
             File destinationFile = new File(filePath);
             file.transferTo(destinationFile);
 
-            // Zapisz informacje o pliku w bazie danych
             VideoMetadata metadata = new VideoMetadata();
             metadata.setFileName(file.getOriginalFilename());
             metadata.setFilePath(filePath);

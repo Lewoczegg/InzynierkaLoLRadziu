@@ -40,8 +40,6 @@ public class ProgressController {
     @GetMapping("/courseCompletionPercentage")
     public Map<String, Object> getCourseCompletionPercentage() {
         double percentage = progressService.calculateCourseCompletionPercentage();
-
-        // Tworzenie mapy z kluczem "count" i wartością procentu
         Map<String, Object> response = new HashMap<>();
         response.put("count", percentage);
 

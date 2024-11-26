@@ -1,6 +1,5 @@
 public class Task15Main {
     public static void main(String[] args) {
-        // Testowanie metody findNumberDivisibleBy7 za pomocą TaskExecutor
         int[][] inputs = {
                 {1, 2, 3, 14, 8, 9},
                 {5, 9, 13, 21, 4, 7},

@@ -3,7 +3,6 @@ import java.util.Arrays;
 
 public class Task24Main {
     public static void main(String[] args) {
-        // Testowanie metody selectionSort za pomocą TaskExecutor
         List<Integer>[] inputs = new List[]{
                 Arrays.asList(64, 25, 12, 22, 11),
                 Arrays.asList(5, 3, 8, 4, 2),

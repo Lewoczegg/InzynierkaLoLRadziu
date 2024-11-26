@@ -16,7 +16,6 @@ public class Task7Main {
                 "15 is not even"
         };
 
-        // Użycie TaskExecutor do przeprowadzenia testów
         TaskExecutor.<Integer, String>executeTest(inputs, expectedResults, Result::checkIfEven);
     }
 }

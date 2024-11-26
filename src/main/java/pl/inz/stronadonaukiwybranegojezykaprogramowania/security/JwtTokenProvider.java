@@ -29,7 +29,6 @@ public class JwtTokenProvider {
 
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
-    private CustomUserDetailsService userDetailsService;
     private final SecretKey jwtSecretKey;
 
     public JwtTokenProvider() {
