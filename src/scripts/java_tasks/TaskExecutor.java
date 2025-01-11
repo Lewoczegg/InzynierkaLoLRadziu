@@ -5,8 +5,8 @@ import java.util.function.Consumer;
 import java.util.*;
 
 public class TaskExecutor {
-
-    public static <T, R> void executeTestBase(T[] inputs, R[] expectedResults, Function<T, R> function) {
+    public static <T, R> void executeTestBase(
+            T[] inputs, R[] expectedResults, Function<T, R> function) {
         boolean allTestsPassed = true;
 
         PrintStream originalOut = System.out;
@@ -61,14 +61,17 @@ public class TaskExecutor {
         writeOutputToFile(userOutputStream);
     }
 
-    private static void writeOutputToFile(ByteArrayOutputStream userOutputStream) {
+    private static void writeOutputToFile(
+            ByteArrayOutputStream userOutputStream) {
         try (FileOutputStream fos = new FileOutputStream("user_output.txt")) {
             fos.write(userOutputStream.toByteArray());
         } catch (IOException e) {
             System.err.println("Error writing user output: " + e.getMessage());
         }
     }
-    public static <T1, T2, R> void executeTest(T1[] inputs, T2[] secondInputs, R[] expectedResults, BiFunction<T1, T2, R> function) {
+
+    public static <T1, T2, R> void executeTest(
+            T1[] inputs, T2[] secondInputs, R[] expectedResults, BiFunction<T1, T2, R> function) {
         Function<Integer, R> wrappedFunction = (index) -> function.apply(inputs[index], secondInputs[index]);
         Integer[] indices = new Integer[inputs.length];
         for (int i = 0; i < inputs.length; i++) {
@@ -77,20 +80,24 @@ public class TaskExecutor {
         executeTestBase(indices, expectedResults, wrappedFunction);
     }
 
-    public static <T, R> void executeTest(T[] inputs, R[] expectedResults, Function<T, R> function) {
+    public static <T, R> void executeTest(
+            T[] inputs, R[] expectedResults, Function<T, R> function) {
         executeTestBase(inputs, expectedResults, function);
     }
 
-    public static <T1, T2, R> void executeTest(T1[][] inputs, R[] expectedResults, BiFunction<T1, T2, R> function) {
+    public static <T1, T2, R> void executeTest(
+            T1[][] inputs, R[] expectedResults, BiFunction<T1, T2, R> function) {
         Function<T1[], R> wrappedFunction = input -> function.apply(input[0], (T2) input[1]);
         executeTestBase(inputs, expectedResults, wrappedFunction);
     }
 
-    public static <T, R> void executeTest(List<T>[] inputs, R[] expectedResults, Function<List<T>, R> function) {
+    public static <T, R> void executeTest(
+            List<T>[] inputs, R[] expectedResults, Function<List<T>, R> function) {
         executeTestBase(inputs, expectedResults, function);
     }
 
-    public static <T> void executeTest(T[] inputs, String[] expectedResults, Consumer<T> function) {
+    public static <T> void executeTest(
+            T[] inputs, String[] expectedResults, Consumer<T> function) {
         Function<T, String> wrappedFunction = input -> {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             PrintStream originalOut = System.out;
@@ -109,7 +116,8 @@ public class TaskExecutor {
         executeTestBase(inputs, expectedResults, wrappedFunction);
     }
 
-    public static void executeTestStack(String[] operations, String[] expectedResults, Stack stack) {
+    public static void executeTestStack(
+            String[] operations, String[] expectedResults, Stack stack) {
         Function<String, String> wrappedFunction = operation -> {
             String[] parts = operation.split(" ");
             String op = parts[0];
@@ -132,7 +140,8 @@ public class TaskExecutor {
         executeTestBase(operations, expectedResults, wrappedFunction);
     }
 
-    public static void executeTestQueue(String[] operations, String[] expectedResults, Queue queue) {
+    public static void executeTestQueue(
+            String[] operations, String[] expectedResults, Queue queue) {
         Function<String, String> wrappedFunction = operation -> {
             String[] parts = operation.split(" ");
             String op = parts[0];

@@ -30,8 +30,8 @@ public class DailyTaskResultService {
     private final DailyTaskRepository dailyTaskRepository;
     private final AssignmentService assignmentService;
 
-    private static final long MAX_TIME_LIMIT = 30;
-    private static final long BONUS_POINTS = 50;
+    private static final long MAX_TIME_LIMIT = 15;
+    private static final long BONUS_POINTS = 20;
 
     public DailyTaskResultService(DailyTaskResultRepository dailyTaskResultRepository, UserRepository userRepository, DailyTaskRepository dailyTaskRepository, AssignmentService assignmentService) {
         this.dailyTaskResultRepository = dailyTaskResultRepository;
@@ -75,7 +75,7 @@ public class DailyTaskResultService {
         Matcher matcher = pattern.matcher(grade.getOutput());
 
         if (matcher.find()) {
-            points += 10;
+            points += 20;
             LocalDateTime completedAt = LocalDateTime.now();
             long duration = Duration.between(startTime, completedAt).toMinutes();
             System.out.println(startTime);

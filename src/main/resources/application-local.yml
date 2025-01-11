@@ -1,5 +1,5 @@
 jwt:
-  expirationMs: 86400000
+  expirationMs: 600000
 
 spring:
   servlet:

@@ -25,7 +25,7 @@ public class QuizResultService {
     private final UserRepository userRepository;
 
     private static final int MAX_TIME_LIMIT = 5;
-    private static final Long BONUS_POINTS = 20L;
+    private static final Long BONUS_POINTS = 10L;
 
     public QuizResultService(QuizResultRepository quizResultRepository, QuizRepository quizRepository, UserRepository userRepository) {
         this.quizResultRepository = quizResultRepository;
@@ -57,7 +57,7 @@ public class QuizResultService {
         for (int i = 0; i < questions.size(); i++) {
             Question question = questions.get(i);
             if (i < userAnswers.size() && question.getCorrectAnswer().equals(userAnswers.get(i))) {
-                points += 10;
+                points += 5;
             }
         }
 

@@ -1,5 +1,5 @@
 jwt:
-  expirationMs: 86400000
+  expirationMs: 600000
 
 spring:
   servlet:
@@ -25,9 +25,7 @@ spring:
   ai:
     ollama:
       base-url: http://localhost:11434/
-      chat:
-        options:
-          model: codellama
+      model: codellama
 
 logging:
   level:

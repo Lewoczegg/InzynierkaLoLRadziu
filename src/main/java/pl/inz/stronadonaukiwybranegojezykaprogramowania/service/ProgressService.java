@@ -68,15 +68,12 @@ public class ProgressService {
         userRepository.save(user);
 
         long completedLessonsCount = progressRepository.countByUserUserId(user.getUserId());
-        if (completedLessonsCount >= 3 && user.getLevel() < 7) {
-            user.setTitle(Title.INTERMEDIATE);
-            userRepository.save(user);
-        }
-
         if (user.getLevel() >= 7) {
             user.setTitle(Title.ADVANCED);
-            userRepository.save(user);
+        } else if (completedLessonsCount >= 3) {
+            user.setTitle(Title.INTERMEDIATE);
         }
+        userRepository.save(user);
     }
 
     public double calculateAssignmentCompletionPercentage() {

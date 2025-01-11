@@ -90,9 +90,10 @@ public class AssignmentService {
         }
         return grade;
     }
-
+    // Przykład metody obsługującej wykonanie kodu w Pythonie lub Javie
     public CodeExecutionResponse codeFromGuest(String userCode, String taskId, String language){
         if ("java".equalsIgnoreCase(language)) {
+
             return executeJavaCode(userCode, taskId);
         } else if ("python".equalsIgnoreCase(language)) {
             return executePythonCode(userCode, taskId);
