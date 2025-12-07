@@ -226,7 +226,7 @@ public class AssignmentService {
                     "docker", "run", "--rm",
                     "-v", workingDir.toAbsolutePath() + ":/app",
                     "-w", "/app",
-                    "openjdk:17",
+                    "eclipse-temurin:17",
                     "sh", "-c", compileCommand
             };
 
@@ -254,7 +254,7 @@ public class AssignmentService {
                     "docker", "run", "--rm",
                     "-v", workingDir.toAbsolutePath() + ":/app",
                     "-w", "/app",
-                    "openjdk:17",
+                    "eclipse-temurin:17",
                     "sh", "-c", runCommand
             };
 
