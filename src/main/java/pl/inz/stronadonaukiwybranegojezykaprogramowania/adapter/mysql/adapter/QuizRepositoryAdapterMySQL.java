@@ -1,6 +1,8 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.mysql.adapter;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.QuizRepositoryAdapter;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.mysql.mapper.QuizMapperMySQL;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.mysql.repository.QuizRepositoryMySQL;
@@ -10,7 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Profile("mysql")
 @Component
+@Transactional
 public class QuizRepositoryAdapterMySQL implements QuizRepositoryAdapter {
 
     private final QuizRepositoryMySQL quizRepository;

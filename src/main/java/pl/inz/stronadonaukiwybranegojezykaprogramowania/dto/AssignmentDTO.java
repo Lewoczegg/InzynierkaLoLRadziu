@@ -1,8 +1,8 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.dto;
 
 import lombok.*;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Assignment;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.AssignmentDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.LessonDomain;
 
 @Getter
 @Setter
@@ -11,13 +11,13 @@ import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
 @AllArgsConstructor
 public class AssignmentDTO {
     private Long assignmentId;
-    private Lesson lesson;
+    private LessonDomain lesson;
     private String title;
     private String description;
     private String titleLvl;
     private boolean available;
 
-    public AssignmentDTO(Assignment assignment, boolean available) {
+    public AssignmentDTO(AssignmentDomain assignment, boolean available) {
         this.assignmentId = assignment.getAssignmentId();
         this.lesson = assignment.getLesson();
         this.title = assignment.getTitle();

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.CourseDTO;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Course;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.CourseDomain;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.CourseService;
 
 import java.util.Collections;
@@ -20,12 +20,12 @@ public class CourseController {
     private CourseService courseService;
 
     @PostMapping("/add")
-    public Course createCourse(@RequestBody Course course) {
+    public CourseDomain createCourse(@RequestBody CourseDomain course) {
         return courseService.createCourse(course.getTitle(), course.getDescription(), course.getTitleLvl());
     }
 
     @GetMapping("/all")
-    public List<Course> getAllCourses() {
+    public List<CourseDomain> getAllCourses() {
         return courseService.getAllCourses();
     }
     @GetMapping("/visible-courses")
@@ -41,7 +41,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Course> getCourseById(@PathVariable Long id) {
+    public Optional<CourseDomain> getCourseById(@PathVariable Long id) {
         return courseService.getCourseById(id);
     }
 }

@@ -4,13 +4,13 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.DailyTask;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.DailyTaskAssignment;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.DailyTaskAssignmentRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.DailyTaskRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.DailyTaskResultRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.DailyTaskDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.DailyTaskAssignmentDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.UserDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.DailyTaskAssignmentRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.DailyTaskRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.DailyTaskResultRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.UserRepositoryAdapter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,45 +20,45 @@ import java.util.Random;
 @Service
 public class DailyTaskService {
 
-    private final DailyTaskRepository dailyTaskRepository;
-    private final UserRepository userRepository;
-    private final DailyTaskResultRepository dailyTaskResultRepository;
-    private final DailyTaskAssignmentRepository dailyTaskAssignmentRepository;
-    public DailyTaskService(DailyTaskRepository dailyTaskRepository, UserRepository userRepository, DailyTaskResultRepository dailyTaskResultRepository, DailyTaskAssignmentRepository dailyTaskAssignmentRepository) {
-        this.dailyTaskRepository = dailyTaskRepository;
-        this.userRepository = userRepository;
-        this.dailyTaskResultRepository = dailyTaskResultRepository;
-        this.dailyTaskAssignmentRepository = dailyTaskAssignmentRepository;
+    private final DailyTaskRepositoryAdapter dailyTaskRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
+    private final DailyTaskResultRepositoryAdapter dailyTaskResultRepositoryAdapter;
+    private final DailyTaskAssignmentRepositoryAdapter dailyTaskAssignmentRepositoryAdapter;
+    public DailyTaskService(DailyTaskRepositoryAdapter dailyTaskRepositoryAdapter, UserRepositoryAdapter userRepositoryAdapter, DailyTaskResultRepositoryAdapter dailyTaskResultRepositoryAdapter, DailyTaskAssignmentRepositoryAdapter dailyTaskAssignmentRepositoryAdapter) {
+        this.dailyTaskRepositoryAdapter = dailyTaskRepositoryAdapter;
+        this.userRepositoryAdapter = userRepositoryAdapter;
+        this.dailyTaskResultRepositoryAdapter = dailyTaskResultRepositoryAdapter;
+        this.dailyTaskAssignmentRepositoryAdapter = dailyTaskAssignmentRepositoryAdapter;
     }
 
-    public DailyTask createDailyTask(DailyTask dailyTask) {
-        return dailyTaskRepository.save(dailyTask);
+    public DailyTaskDomain createDailyTask(DailyTaskDomain dailyTask) {
+        return dailyTaskRepositoryAdapter.save(dailyTask);
     }
 
-    public DailyTask getDailyTaskById(Long taskId) {
-        return dailyTaskRepository.findById(taskId)
+    public DailyTaskDomain getDailyTaskById(Long taskId) {
+        return dailyTaskRepositoryAdapter.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
     }
 
-    public List<DailyTask> getAllDailyTasks() {
-        return dailyTaskRepository.findAll();
+    public List<DailyTaskDomain> getAllDailyTasks() {
+        return dailyTaskRepositoryAdapter.findAll();
     }
 
-    public DailyTask updateDailyTask(Long taskId, DailyTask updatedDailyTask) {
-        DailyTask existingTask = dailyTaskRepository.findById(taskId)
+    public DailyTaskDomain updateDailyTask(Long taskId, DailyTaskDomain updatedDailyTask) {
+        DailyTaskDomain existingTask = dailyTaskRepositoryAdapter.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
         existingTask.setTitle(updatedDailyTask.getTitle());
         existingTask.setDescription(updatedDailyTask.getDescription());
-        return dailyTaskRepository.save(existingTask);
+        return dailyTaskRepositoryAdapter.save(existingTask);
     }
 
     public void deleteDailyTask(Long taskId) {
-        DailyTask dailyTask = dailyTaskRepository.findById(taskId)
+        DailyTaskDomain dailyTask = dailyTaskRepositoryAdapter.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
-        dailyTaskRepository.delete(dailyTask);
+        dailyTaskRepositoryAdapter.deleteById(dailyTask.getTaskId());
     }
     @Transactional
-    public synchronized Optional<DailyTask> getDailyTaskForUser() {
+    public synchronized Optional<DailyTaskDomain> getDailyTaskForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
@@ -66,39 +66,39 @@ public class DailyTaskService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
         LocalDate today = LocalDate.now();
 
-        boolean hasCompletedToday = dailyTaskResultRepository
+        boolean hasCompletedToday = dailyTaskResultRepositoryAdapter
                 .findByUserAndCompletedAtBetween(user, today.atStartOfDay(), today.plusDays(1).atStartOfDay())
                 .isPresent();
         if (hasCompletedToday) {
             return Optional.empty();
         }
 
-        Optional<DailyTaskAssignment> existingAssignment = dailyTaskAssignmentRepository.findByUserAndAssignmentDate(user, today);
+        Optional<DailyTaskAssignmentDomain> existingAssignment = dailyTaskAssignmentRepositoryAdapter.findByUserAndAssignmentDate(user, today);
         if (existingAssignment.isPresent()) {
             return Optional.of(existingAssignment.get().getDailyTask());
         }
 
-        List<DailyTask> availableTasks = dailyTaskRepository.findAllNotCompletedByUser(user.getUserId());
+        List<DailyTaskDomain> availableTasks = dailyTaskRepositoryAdapter.findAllNotCompletedByUser(user.getUserId());
 
         if (availableTasks.isEmpty()) {
             return Optional.empty();
         }
 
         Random random = new Random();
-        DailyTask randomTask = availableTasks.get(random.nextInt(availableTasks.size()));
+        DailyTaskDomain randomTask = availableTasks.get(random.nextInt(availableTasks.size()));
 
-        DailyTaskAssignment newAssignment = new DailyTaskAssignment();
+        DailyTaskAssignmentDomain newAssignment = new DailyTaskAssignmentDomain();
         newAssignment.setUser(user);
         newAssignment.setDailyTask(randomTask);
         newAssignment.setAssignmentDate(today);
-        dailyTaskAssignmentRepository.save(newAssignment);
+        dailyTaskAssignmentRepositoryAdapter.save(newAssignment);
         return Optional.of(randomTask);
     }
 }

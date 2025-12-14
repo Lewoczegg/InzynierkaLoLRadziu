@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.VideoMetadata;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.VideoMetadataDomain;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.VideoMetadataService;
 
 @RestController
@@ -23,7 +23,7 @@ public class VideoMetadataController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadVideo(@RequestParam("video") MultipartFile file) {
         try {
-            VideoMetadata metadata = videoService.saveVideo(file);
+            VideoMetadataDomain metadata = videoService.saveVideo(file);
             return ResponseEntity.ok("File uploaded successfully: " + metadata.getFileName());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to upload file: " + e.getMessage());

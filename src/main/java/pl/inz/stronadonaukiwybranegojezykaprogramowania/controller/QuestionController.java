@@ -1,7 +1,7 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Question;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.QuestionDomain;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.QuestionService;
 
 import java.util.List;
@@ -17,26 +17,26 @@ public class QuestionController {
     }
 
     @PostMapping("/create/{quizId}")
-    public ResponseEntity<Question> createQuestion(@PathVariable Long quizId, @RequestBody Question question) {
-        Question savedQuestion = questionService.createQuestion(quizId, question);
+    public ResponseEntity<QuestionDomain> createQuestion(@PathVariable Long quizId, @RequestBody QuestionDomain question) {
+        QuestionDomain savedQuestion = questionService.createQuestion(quizId, question);
         return ResponseEntity.ok(savedQuestion);
     }
 
     @GetMapping("/{questionId}")
-    public ResponseEntity<Question> getQuestionById(@PathVariable Long questionId) {
-        Question question = questionService.getQuestionById(questionId);
+    public ResponseEntity<QuestionDomain> getQuestionById(@PathVariable Long questionId) {
+        QuestionDomain question = questionService.getQuestionById(questionId);
         return ResponseEntity.ok(question);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Question>> getAllQuestions() {
-        List<Question> questions = questionService.getAllQuestions();
+    public ResponseEntity<List<QuestionDomain>> getAllQuestions() {
+        List<QuestionDomain> questions = questionService.getAllQuestions();
         return ResponseEntity.ok(questions);
     }
 
     @PutMapping("/{questionId}")
-    public ResponseEntity<Question> updateQuestion(@PathVariable Long questionId, @RequestBody Question updatedQuestion) {
-        Question savedQuestion = questionService.updateQuestion(questionId, updatedQuestion);
+    public ResponseEntity<QuestionDomain> updateQuestion(@PathVariable Long questionId, @RequestBody QuestionDomain updatedQuestion) {
+        QuestionDomain savedQuestion = questionService.updateQuestion(questionId, updatedQuestion);
         return ResponseEntity.ok(savedQuestion);
     }
 

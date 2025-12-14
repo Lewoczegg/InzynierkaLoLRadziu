@@ -21,6 +21,9 @@ public class QuestionEntityMySQL {
     private String content;
 
     @ElementCollection
+    @CollectionTable(name = "question_options", 
+                     joinColumns = @JoinColumn(name = "question_question_id"))
+    @Column(name = "options")
     private List<String> options;
 
     @Column(nullable = false)

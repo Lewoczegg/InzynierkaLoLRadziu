@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.RegisterRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.UpdateUserRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.RoleRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.UserDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.RoleRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.UserRepositoryAdapter;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.security.JwtTokenProvider;
 
 import java.sql.Timestamp;
@@ -24,16 +24,16 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final UserRepositoryAdapter userRepositoryAdapter;
+    private final RoleRepositoryAdapter roleRepositoryAdapter;
 
-    public AuthService(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, UserRepository userRepository, RoleRepository roleRepository) {
+    public AuthService(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, UserRepositoryAdapter userRepositoryAdapter, RoleRepositoryAdapter roleRepositoryAdapter) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.userRepositoryAdapter = userRepositoryAdapter;
+        this.roleRepositoryAdapter = roleRepositoryAdapter;
     }
 
     public String login(String username, String password) {
@@ -49,7 +49,7 @@ public class AuthService {
     }
 
     public void register(RegisterRequest registerRequest) {
-        User user = new User();
+        UserDomain user = new UserDomain();
         user.setUsername(registerRequest.getUsername());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
@@ -57,16 +57,16 @@ public class AuthService {
         user.setSurname(registerRequest.getSurname());
         user.setPhoneNumber(registerRequest.getPhoneNumber());
         user.setAge(registerRequest.getAge());
-        user.setRole(roleRepository.findRoleByroleId(2L).get());
+        user.setRole(roleRepositoryAdapter.findById(2L).get());
         user.setTitle(Title.BEGINNER);
         user.setLevel(1);
         user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        userRepository.save(user);
+        userRepositoryAdapter.save(user);
     }
 
-    public User updateUser(Long id, UpdateUserRequest updateUserRequest) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    public UserDomain updateUser(Long id, UpdateUserRequest updateUserRequest) {
+        UserDomain user = userRepositoryAdapter.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         user.setUsername(updateUserRequest.getUsername());
         user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
         user.setEmail(updateUserRequest.getEmail());
@@ -75,15 +75,15 @@ public class AuthService {
         user.setPhoneNumber(updateUserRequest.getPhoneNumber());
         user.setAge(updateUserRequest.getAge());
         user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        userRepository.save(user);
+        userRepositoryAdapter.save(user);
         return user;
     }
 
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        userRepositoryAdapter.deleteById(id);
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    public UserDomain getUserById(Long id) {
+        return userRepositoryAdapter.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

@@ -1,5 +1,6 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.mysql.adapter;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.CommentRepositoryAdapter;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.mysql.mapper.CommentMapperMySQL;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Profile("mysql")
 @Component
 public class CommentRepositoryAdapterMySQL implements CommentRepositoryAdapter {
 

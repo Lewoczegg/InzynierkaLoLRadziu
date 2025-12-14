@@ -7,8 +7,8 @@ import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.LoginRequest
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.RegisterRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.UpdateUserRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.JwtResponse;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.UserDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.UserRepositoryAdapter;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.AuthService;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.UserService;
 
@@ -20,11 +20,11 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserRepository userRepository;
+    private final UserRepositoryAdapter userRepositoryAdapter;
     private final UserService userService;
-    public AuthController(AuthService authService, UserRepository userRepository, UserService userService) {
+    public AuthController(AuthService authService, UserRepositoryAdapter userRepositoryAdapter, UserService userService) {
         this.authService = authService;
-        this.userRepository = userRepository;
+        this.userRepositoryAdapter = userRepositoryAdapter;
         this.userService = userService;
     }
 
@@ -42,7 +42,7 @@ public class AuthController {
 
     @PutMapping("/user/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest updateUserRequest) {
-        User updatedUser = authService.updateUser(id, updateUserRequest);
+        UserDomain updatedUser = authService.updateUser(id, updateUserRequest);
         return ResponseEntity.ok(updatedUser);
     }
 
@@ -54,13 +54,13 @@ public class AuthController {
 
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        User user = authService.getUserById(id);
+        UserDomain user = authService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userRepository.findAll();
+    public ResponseEntity<List<UserDomain>> getAllUsers() {
+        List<UserDomain> users = userRepositoryAdapter.findAll();
         return ResponseEntity.ok(users);
     }
 

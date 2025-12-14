@@ -19,5 +19,5 @@ public class QuestionDomain {
 
     private String correctAnswer;
 
-    private QuizDomain quiz;
+    private Long quizId;
 }

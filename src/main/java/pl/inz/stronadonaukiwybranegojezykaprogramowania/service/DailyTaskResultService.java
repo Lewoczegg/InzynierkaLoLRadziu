@@ -4,12 +4,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecutionResponse;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.DailyTask;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.DailyTaskResult;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.DailyTaskRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.DailyTaskResultRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.DailyTaskDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.DailyTaskResultDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.UserDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.DailyTaskRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.DailyTaskResultRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.UserRepositoryAdapter;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -23,20 +23,20 @@ import java.util.regex.Pattern;
 @Service
 public class DailyTaskResultService {
 
-    private final DailyTaskResultRepository dailyTaskResultRepository;
+    private final DailyTaskResultRepositoryAdapter dailyTaskResultRepositoryAdapter;
 
-    private final UserRepository userRepository;
+    private final UserRepositoryAdapter userRepositoryAdapter;
 
-    private final DailyTaskRepository dailyTaskRepository;
+    private final DailyTaskRepositoryAdapter dailyTaskRepositoryAdapter;
     private final AssignmentService assignmentService;
 
     private static final long MAX_TIME_LIMIT = 15;
     private static final long BONUS_POINTS = 20;
 
-    public DailyTaskResultService(DailyTaskResultRepository dailyTaskResultRepository, UserRepository userRepository, DailyTaskRepository dailyTaskRepository, AssignmentService assignmentService) {
-        this.dailyTaskResultRepository = dailyTaskResultRepository;
-        this.userRepository = userRepository;
-        this.dailyTaskRepository = dailyTaskRepository;
+    public DailyTaskResultService(DailyTaskResultRepositoryAdapter dailyTaskResultRepositoryAdapter, UserRepositoryAdapter userRepositoryAdapter, DailyTaskRepositoryAdapter dailyTaskRepositoryAdapter, AssignmentService assignmentService) {
+        this.dailyTaskResultRepositoryAdapter = dailyTaskResultRepositoryAdapter;
+        this.userRepositoryAdapter = userRepositoryAdapter;
+        this.dailyTaskRepositoryAdapter = dailyTaskRepositoryAdapter;
         this.assignmentService = assignmentService;
     }
 
@@ -48,16 +48,16 @@ public class DailyTaskResultService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
-        DailyTask dailyTask = dailyTaskRepository.findById(Long.valueOf(taskId.replaceAll("\\D+", "")))
+        DailyTaskDomain dailyTask = dailyTaskRepositoryAdapter.findById(Long.valueOf(taskId.replaceAll("\\D+", "")))
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
 
 
-        Optional<DailyTaskResult> existingResult = dailyTaskResultRepository.findByUserAndDailyTask(user, dailyTask);
+        Optional<DailyTaskResultDomain> existingResult = dailyTaskResultRepositoryAdapter.findByUserAndDailyTask(user, dailyTask);
         if (existingResult.isPresent()) {
             System.out.println("This task has already been completed");
 
@@ -88,16 +88,16 @@ public class DailyTaskResultService {
             }
             System.out.println(points);
             System.out.println("AFTER");
-            DailyTaskResult dailyTaskResult = new DailyTaskResult(user, dailyTask, points);
+            DailyTaskResultDomain dailyTaskResult = new DailyTaskResultDomain(user, dailyTask, points);
             dailyTaskResult.setCompletedAt(completedAt);
-            dailyTaskResultRepository.save(dailyTaskResult);
+            dailyTaskResultRepositoryAdapter.save(dailyTaskResult);
 
         }
 
         return grade;
     }
     public Map<String, Long> getTotalPointsForAllUsers() {
-        List<Object[]> results = dailyTaskResultRepository.findTotalPointsForAllUsers();
+        List<Object[]> results = dailyTaskResultRepositoryAdapter.findTotalPointsForAllUsers();
         Map<String, Long> userPointsMap = new HashMap<>();
         for (Object[] result : results) {
             String username = (String) result[0];

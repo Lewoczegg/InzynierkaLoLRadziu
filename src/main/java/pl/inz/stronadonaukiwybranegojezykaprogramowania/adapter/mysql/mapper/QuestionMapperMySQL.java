@@ -2,16 +2,11 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.mysql.mapper;
 
 import org.springframework.stereotype.Component;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.mysql.entity.QuestionEntityMySQL;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.mysql.entity.QuizEntityMySQL;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.QuestionDomain;
 
 @Component
 public class QuestionMapperMySQL {
-
-    private final QuizMapperMySQL quizMapper;
-
-    public QuestionMapperMySQL(QuizMapperMySQL quizMapper) {
-        this.quizMapper = quizMapper;
-    }
 
     public QuestionDomain toDomain(QuestionEntityMySQL entity) {
         if (entity == null) {
@@ -23,7 +18,7 @@ public class QuestionMapperMySQL {
                 .content(entity.getContent())
                 .options(entity.getOptions())
                 .correctAnswer(entity.getCorrectAnswer())
-                .quiz(quizMapper.toDomain(entity.getQuiz()))
+                .quizId(entity.getQuiz() != null ? entity.getQuiz().getQuizId() : null)
                 .build();
     }
 
@@ -32,12 +27,19 @@ public class QuestionMapperMySQL {
             return null;
         }
         
-        return QuestionEntityMySQL.builder()
+        QuestionEntityMySQL entity = QuestionEntityMySQL.builder()
                 .questionId(domain.getQuestionId())
                 .content(domain.getContent())
                 .options(domain.getOptions())
                 .correctAnswer(domain.getCorrectAnswer())
-                .quiz(quizMapper.toEntity(domain.getQuiz()))
                 .build();
+        
+        if (domain.getQuizId() != null) {
+            QuizEntityMySQL quiz = new QuizEntityMySQL();
+            quiz.setQuizId(domain.getQuizId());
+            entity.setQuiz(quiz);
+        }
+        
+        return entity;
     }
 }

@@ -2,12 +2,13 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Question;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Quiz;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.QuizRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.QuizResultRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.QuestionDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.QuizDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.UserDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.QuestionRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.QuizRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.QuizResultRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.UserRepositoryAdapter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,29 +18,31 @@ import java.util.Random;
 @Service
 public class QuizService {
 
-    private final QuizRepository quizRepository;
-    private final QuizResultRepository quizResultRepository;
-    private final UserRepository userRepository;
+    private final QuizRepositoryAdapter quizRepositoryAdapter;
+    private final QuestionRepositoryAdapter questionRepositoryAdapter;
+    private final QuizResultRepositoryAdapter quizResultRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
 
-    public QuizService(QuizRepository quizRepository, QuizResultRepository quizResultRepository, UserRepository userRepository) {
-        this.quizRepository = quizRepository;
-        this.quizResultRepository = quizResultRepository;
-        this.userRepository = userRepository;
+    public QuizService(QuizRepositoryAdapter quizRepositoryAdapter, QuestionRepositoryAdapter questionRepositoryAdapter, QuizResultRepositoryAdapter quizResultRepositoryAdapter, UserRepositoryAdapter userRepositoryAdapter) {
+        this.quizRepositoryAdapter = quizRepositoryAdapter;
+        this.questionRepositoryAdapter = questionRepositoryAdapter;
+        this.quizResultRepositoryAdapter = quizResultRepositoryAdapter;
+        this.userRepositoryAdapter = userRepositoryAdapter;
     }
-    public Optional<Quiz> getDailyQuizForUser() {
+    public Optional<QuizDomain> getDailyQuizForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new IllegalStateException("User is not authenticated");
         }
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
         LocalDate today = LocalDate.now();
-        boolean hasCompletedToday = quizResultRepository
+        boolean hasCompletedToday = quizResultRepositoryAdapter
                 .findByUserAndCompletedAtBetween(user, today.atStartOfDay(), today.plusDays(1).atStartOfDay())
                 .isPresent();
 
@@ -47,51 +50,56 @@ public class QuizService {
             return Optional.empty();
         }
 
-        List<Quiz> availableQuizzes = quizRepository.findAllNotCompletedByUser(user.getUserId());
+        List<QuizDomain> availableQuizzes = quizRepositoryAdapter.findAllNotCompletedByUser(user.getUserId());
 
         if (availableQuizzes.isEmpty()) {
             return Optional.empty();
         }
 
         Random random = new Random();
-        Quiz randomQuiz = availableQuizzes.get(random.nextInt(availableQuizzes.size()));
+        QuizDomain randomQuiz = availableQuizzes.get(random.nextInt(availableQuizzes.size()));
         return Optional.of(randomQuiz);
     }
-    public Quiz createQuiz(Quiz quiz) {
+    public QuizDomain createQuiz(QuizDomain quiz) {
+        QuizDomain savedQuiz = quizRepositoryAdapter.save(quiz);
+        
         if (quiz.getQuestions() != null) {
-            for (Question question : quiz.getQuestions()) {
-                question.setQuiz(quiz);
+            for (QuestionDomain question : quiz.getQuestions()) {
+                question.setQuizId(savedQuiz.getQuizId());
+                questionRepositoryAdapter.save(question);
             }
+            savedQuiz.setQuestions(quiz.getQuestions());
         }
-        return quizRepository.save(quiz);
+        
+        return savedQuiz;
     }
 
-    public Quiz getQuizById(Long quizId) {
-        return quizRepository.findById(quizId)
+    public QuizDomain getQuizById(Long quizId) {
+        return quizRepositoryAdapter.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz not found with id: " + quizId));
     }
 
-    public List<Quiz> getAllQuizzes() {
-        return quizRepository.findAll();
+    public List<QuizDomain> getAllQuizzes() {
+        return quizRepositoryAdapter.findAll();
     }
 
-    public Quiz updateQuiz(Long quizId, Quiz updatedQuiz) {
-        Quiz existingQuiz = quizRepository.findById(quizId)
+    public QuizDomain updateQuiz(Long quizId, QuizDomain updatedQuiz) {
+        QuizDomain existingQuiz = quizRepositoryAdapter.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz not found with id: " + quizId));
         existingQuiz.setTitle(updatedQuiz.getTitle());
 
         existingQuiz.getQuestions().clear();
         if (updatedQuiz.getQuestions() != null) {
-            for (Question question : updatedQuiz.getQuestions()) {
+            for (QuestionDomain question : updatedQuiz.getQuestions()) {
                 existingQuiz.addQuestion(question);
             }
         }
-        return quizRepository.save(existingQuiz);
+        return quizRepositoryAdapter.save(existingQuiz);
     }
 
     public void deleteQuiz(Long quizId) {
-        Quiz quiz = quizRepository.findById(quizId)
+        QuizDomain quiz = quizRepositoryAdapter.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz not found with id: " + quizId));
-        quizRepository.delete(quiz);
+        quizRepositoryAdapter.deleteById(quiz.getQuizId());
     }
 }

@@ -3,18 +3,18 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.UserDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.UserRepositoryAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserRepositoryAdapter userRepositoryAdapter;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserService(UserRepositoryAdapter userRepositoryAdapter) {
+        this.userRepositoryAdapter = userRepositoryAdapter;
     }
 
     public Map<String, Object> getUserInfo() {
@@ -24,7 +24,7 @@ public class UserService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }

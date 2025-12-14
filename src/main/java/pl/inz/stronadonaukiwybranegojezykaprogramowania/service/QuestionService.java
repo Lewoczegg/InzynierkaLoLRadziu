@@ -1,52 +1,52 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.service;
 import org.springframework.stereotype.Service;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Question;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Quiz;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.QuestionRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.QuizRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.QuestionDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.QuizDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.QuestionRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.QuizRepositoryAdapter;
 
 import java.util.List;
 
 @Service
 public class QuestionService {
 
-    private final QuestionRepository questionRepository;
+    private final QuestionRepositoryAdapter questionRepositoryAdapter;
 
-    private final QuizRepository quizRepository;
+    private final QuizRepositoryAdapter quizRepositoryAdapter;
 
-    public QuestionService(QuestionRepository questionRepository, QuizRepository quizRepository) {
-        this.questionRepository = questionRepository;
-        this.quizRepository = quizRepository;
+    public QuestionService(QuestionRepositoryAdapter questionRepositoryAdapter, QuizRepositoryAdapter quizRepositoryAdapter) {
+        this.questionRepositoryAdapter = questionRepositoryAdapter;
+        this.quizRepositoryAdapter = quizRepositoryAdapter;
     }
 
-    public Question createQuestion(Long quizId, Question question) {
-        Quiz quiz = quizRepository.findById(quizId)
+    public QuestionDomain createQuestion(Long quizId, QuestionDomain question) {
+        quizRepositoryAdapter.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz not found with id: " + quizId));
-        question.setQuiz(quiz);
-        return questionRepository.save(question);
+        question.setQuizId(quizId);
+        return questionRepositoryAdapter.save(question);
     }
 
-    public Question getQuestionById(Long questionId) {
-        return questionRepository.findById(questionId)
+    public QuestionDomain getQuestionById(Long questionId) {
+        return questionRepositoryAdapter.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found with id: " + questionId));
     }
 
-    public List<Question> getAllQuestions() {
-        return questionRepository.findAll();
+    public List<QuestionDomain> getAllQuestions() {
+        return questionRepositoryAdapter.findAll();
     }
 
-    public Question updateQuestion(Long questionId, Question updatedQuestion) {
-        Question question = questionRepository.findById(questionId)
+    public QuestionDomain updateQuestion(Long questionId, QuestionDomain updatedQuestion) {
+        QuestionDomain question = questionRepositoryAdapter.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found with id: " + questionId));
         question.setContent(updatedQuestion.getContent());
         question.setOptions(updatedQuestion.getOptions());
         question.setCorrectAnswer(updatedQuestion.getCorrectAnswer());
-        return questionRepository.save(question);
+        return questionRepositoryAdapter.save(question);
     }
 
     public void deleteQuestion(Long questionId) {
-        Question question = questionRepository.findById(questionId)
+        QuestionDomain question = questionRepositoryAdapter.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found with id: " + questionId));
-        questionRepository.delete(question);
+        questionRepositoryAdapter.deleteById(question.getQuestionId());
     }
 }

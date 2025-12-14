@@ -5,12 +5,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.CourseDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Course;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.CourseRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.LessonRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.CourseDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.UserDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.CourseRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.UserRepositoryAdapter;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -21,22 +19,22 @@ import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
-    private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
-    public CourseService(CourseRepository courseRepository, UserRepository userRepository) {
-        this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
+    private final CourseRepositoryAdapter courseRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
+    public CourseService(CourseRepositoryAdapter courseRepositoryAdapter, UserRepositoryAdapter userRepositoryAdapter) {
+        this.courseRepositoryAdapter = courseRepositoryAdapter;
+        this.userRepositoryAdapter = userRepositoryAdapter;
     }
 
-    public Course createCourse(String title, String description, Title titleLvl) {
-        Course course = new Course();
+    public CourseDomain createCourse(String title, String description, Title titleLvl) {
+        CourseDomain course = new CourseDomain();
         course.setTitle(title);
         course.setDescription(description);
         course.setTitleLvl(titleLvl);
         course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-        return courseRepository.save(course);
+        return courseRepositoryAdapter.save(course);
     }
 
     public List<CourseDTO> getVisibleCoursesForUser() {
@@ -46,12 +44,12 @@ public class CourseService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
         Title userTitle = user.getTitle();
-        List<Course> allCourses = getAllCourses();
+        List<CourseDomain> allCourses = getAllCourses();
 
         return allCourses.stream()
                 .map(course -> {
@@ -61,12 +59,12 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
+    public List<CourseDomain> getAllCourses() {
+        return courseRepositoryAdapter.findAll();
     }
 
-    public Optional<Course> getCourseById(Long id) {
-        return courseRepository.findById(id);
+    public Optional<CourseDomain> getCourseById(Long id) {
+        return courseRepositoryAdapter.findById(id);
     }
 }
 

@@ -2,10 +2,8 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.postgresql.enti
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CompositeType;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.postgresql.type.ContactInfo;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.postgresql.type.FullName;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.postgresql.type.UserLevel;
+import org.hibernate.annotations.Type;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.postgresql.type.*;
 
 import java.sql.Timestamp;
 
@@ -15,7 +13,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user")
+@Table(name = "\"user\"")
 public class UserEntityPostgres {
     
     @Id
@@ -28,18 +26,12 @@ public class UserEntityPostgres {
     @Column(nullable = false)
     private String password;
 
-    @AttributeOverrides({
-        @AttributeOverride(name = "firstName", column = @Column(name = "name.first_name")),
-        @AttributeOverride(name = "surname", column = @Column(name = "name.surname"))
-    })
-    @Embedded
+    @Type(FullNameType.class)
+    @Column(name = "name", columnDefinition = "full_name")
     private FullName name;
 
-    @AttributeOverrides({
-        @AttributeOverride(name = "email", column = @Column(name = "contacts.email")),
-        @AttributeOverride(name = "phoneNumber", column = @Column(name = "contacts.phone_number"))
-    })
-    @Embedded
+    @Type(ContactInfoType.class)
+    @Column(name = "contacts", columnDefinition = "contact_info")
     private ContactInfo contacts;
 
     private Integer age;
@@ -54,10 +46,7 @@ public class UserEntityPostgres {
     @Column(nullable = false)
     private Timestamp updatedAt;
 
-    @AttributeOverrides({
-        @AttributeOverride(name = "level", column = @Column(name = "level_info.level")),
-        @AttributeOverride(name = "title", column = @Column(name = "level_info.title"))
-    })
-    @Embedded
+    @Type(UserLevelType.class)
+    @Column(name = "level_info", columnDefinition = "user_level")
     private UserLevel levelInfo;
 }

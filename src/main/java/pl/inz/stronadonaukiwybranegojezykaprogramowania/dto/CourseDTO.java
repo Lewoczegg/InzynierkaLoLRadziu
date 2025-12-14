@@ -1,7 +1,7 @@
 package pl.inz.stronadonaukiwybranegojezykaprogramowania.dto;
 
 import lombok.*;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Course;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.CourseDomain;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ public class CourseDTO {
     private String titleLvl;
     private boolean available;
 
-    public CourseDTO(Course course, boolean available) {
+    public CourseDTO(CourseDomain course, boolean available) {
         this.courseId = course.getCourseId();
         this.title = course.getTitle();
         this.description = course.getDescription();

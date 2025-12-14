@@ -10,9 +10,9 @@ import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecuti
 
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.AssignmentDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.*;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.*;
 
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.*;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -25,18 +25,18 @@ import java.util.stream.Collectors;
 @Service
 public class AssignmentService {
 
-    private final AssignmentRepository assignmentRepository;
-    private final LessonRepository lessonRepository;
-    private final SubmissionRepository submissionRepository;
-    private final UserRepository userRepository;
-    private final CourseRepository courseRepository;
+    private final AssignmentRepositoryAdapter assignmentRepositoryAdapter;
+    private final LessonRepositoryAdapter lessonRepositoryAdapter;
+    private final SubmissionRepositoryAdapter submissionRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
+    private final CourseRepositoryAdapter courseRepositoryAdapter;
     private final ProgressService progressService;
-    public AssignmentService(AssignmentRepository assignmentRepository, LessonRepository lessonRepository, SubmissionRepository submissionRepository, UserRepository userRepository, CourseRepository courseRepository, ProgressService progressService) {
-        this.assignmentRepository = assignmentRepository;
-        this.lessonRepository = lessonRepository;
-        this.submissionRepository = submissionRepository;
-        this.userRepository = userRepository;
-        this.courseRepository = courseRepository;
+    public AssignmentService(AssignmentRepositoryAdapter assignmentRepositoryAdapter, LessonRepositoryAdapter lessonRepositoryAdapter, SubmissionRepositoryAdapter submissionRepositoryAdapter, UserRepositoryAdapter userRepositoryAdapter, CourseRepositoryAdapter courseRepositoryAdapter, ProgressService progressService) {
+        this.assignmentRepositoryAdapter = assignmentRepositoryAdapter;
+        this.lessonRepositoryAdapter = lessonRepositoryAdapter;
+        this.submissionRepositoryAdapter = submissionRepositoryAdapter;
+        this.userRepositoryAdapter = userRepositoryAdapter;
+        this.courseRepositoryAdapter = courseRepositoryAdapter;
         this.progressService = progressService;
     }
 
@@ -47,13 +47,13 @@ public class AssignmentService {
             throw new IllegalStateException("User is not authenticated");
         }
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
         String userTitle = String.valueOf(user.getTitle());
 
-        Assignment assignment = assignmentRepository.findByAssignmentId(Long.valueOf(taskId));
+        AssignmentDomain assignment = assignmentRepositoryAdapter.findByAssignmentId(Long.valueOf(taskId));
         if (assignment == null) {
             throw new IllegalArgumentException("Assignment not found");
         }
@@ -72,16 +72,16 @@ public class AssignmentService {
 
         if (matcher.find()) {
 
-            Submission submission = new Submission();
-            submission.setAssignment(assignmentRepository.findByAssignmentId(Long.valueOf(taskId)));
-            submission.setUser(userRepository.findByUsername(username));
+            SubmissionDomain submission = new SubmissionDomain();
+            submission.setAssignment(assignmentRepositoryAdapter.findByAssignmentId(Long.valueOf(taskId)));
+            submission.setUser(userRepositoryAdapter.findByUsername(username));
             submission.setContent(userCode);
             submission.setGrade(100F);
             submission.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
             submission.setGradedAt(new Timestamp(System.currentTimeMillis()));
 
-            submissionRepository.save(submission);
-            progressService.markLessonAsCompleted(lessonRepository.findById(assignmentRepository.findById(Long.valueOf(taskId)).get().getLesson().getLessonId()).get().getLessonId());
+            submissionRepositoryAdapter.save(submission);
+            progressService.markLessonAsCompleted(lessonRepositoryAdapter.findById(assignmentRepositoryAdapter.findById(Long.valueOf(taskId)).get().getLesson().getLessonId()).get().getLessonId());
         } else {
             grade.setSuccess(false);
             grade.setUserOutput("");
@@ -322,12 +322,12 @@ public class AssignmentService {
         return output.toString();
     }
 
-    public Assignment createAssignment(String title, String description, Long lessonId, Title titleLvl) {
-        Optional<Lesson> lessonOpt = lessonRepository.findById(lessonId);
+    public AssignmentDomain createAssignment(String title, String description, Long lessonId, Title titleLvl) {
+        Optional<LessonDomain> lessonOpt = lessonRepositoryAdapter.findById(lessonId);
         if (lessonOpt.isEmpty()){
             throw new RuntimeException("Lesson not found");
         }
-        Assignment assignment = new Assignment();
+        AssignmentDomain assignment = new AssignmentDomain();
         assignment.setTitle(title);
         assignment.setDescription(description);
         assignment.setLesson(lessonOpt.get());
@@ -335,11 +335,11 @@ public class AssignmentService {
         assignment.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         assignment.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-        return assignmentRepository.save(assignment);
+        return assignmentRepositoryAdapter.save(assignment);
     }
 
-    public List<Assignment> getAllAssignments() {
-        return assignmentRepository.findAll();
+    public List<AssignmentDomain> getAllAssignments() {
+        return assignmentRepositoryAdapter.findAll();
     }
     public Optional<AssignmentResponse> getAssignmentById(Long id) {
         // Pobierz obiekt Authentication z SecurityContext
@@ -355,7 +355,7 @@ public class AssignmentService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(", "));
 
-        Optional<Assignment> assignmentOptional = assignmentRepository.findById(id);
+        Optional<AssignmentDomain> assignmentOptional = assignmentRepositoryAdapter.findById(id);
 
         return assignmentOptional.map(assignment -> new AssignmentResponse(assignment, roles));
     }
@@ -367,24 +367,24 @@ public class AssignmentService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
-        List<Course> courses = courseRepository.findAll();
+        List<CourseDomain> courses = courseRepositoryAdapter.findAll();
         Map<String, Object> response = new HashMap<>();
 
-        for (Course course : courses) {
-            List<Lesson> lessons = lessonRepository.findByCourseCourseId(course.getCourseId());
+        for (CourseDomain course : courses) {
+            List<LessonDomain> lessons = lessonRepositoryAdapter.findByCourseCourseId(course.getCourseId());
             List<Map<String, Object>> lessonsData = new ArrayList<>();
 
-            for (Lesson lesson : lessons) {
-                List<Assignment> assignments = assignmentRepository.findByLessonLessonId(lesson.getLessonId());
+            for (LessonDomain lesson : lessons) {
+                List<AssignmentDomain> assignments = assignmentRepositoryAdapter.findByLessonLessonId(lesson.getLessonId());
                 List<Map<String, Object>> assignmentsData = new ArrayList<>();
 
-                for (Assignment assignment : assignments) {
-                    Submission latestSubmission = submissionRepository.findTopByUserUserIdAndAssignmentAssignmentIdOrderBySubmittedAtDesc(
+                for (AssignmentDomain assignment : assignments) {
+                    SubmissionDomain latestSubmission = submissionRepositoryAdapter.findTopByUserUserIdAndAssignmentAssignmentIdOrderBySubmittedAtDesc(
                             user.getUserId(), assignment.getAssignmentId()).orElse(null);
 
                     if (latestSubmission != null) {
@@ -426,13 +426,13 @@ public class AssignmentService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
         Title userTitle = user.getTitle();
         int userLessonLevel = user.getLevel();
-        List<Assignment> allAssignments = assignmentRepository.findAll();
+        List<AssignmentDomain> allAssignments = assignmentRepositoryAdapter.findAll();
         return allAssignments.stream()
                 .map(assignment -> {
                     boolean isTitleLevelMatch = userTitle.ordinal() >= assignment.getTitleLvl().ordinal();
@@ -443,15 +443,15 @@ public class AssignmentService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<Assignment> updateAssignment(Long id, Assignment updatedAssignment) {
-        return assignmentRepository.findById(id).map(existingAssignment -> {
+    public Optional<AssignmentDomain> updateAssignment(Long id, AssignmentDomain updatedAssignment) {
+        return assignmentRepositoryAdapter.findById(id).map(existingAssignment -> {
             existingAssignment.setTitle(updatedAssignment.getTitle());
             existingAssignment.setDescription(updatedAssignment.getDescription());
             existingAssignment.setLesson(updatedAssignment.getLesson());
             existingAssignment.setTitleLvl(updatedAssignment.getTitleLvl());
             existingAssignment.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             existingAssignment.setCreatedAt(existingAssignment.getCreatedAt());
-            return assignmentRepository.save(existingAssignment);
+            return assignmentRepositoryAdapter.save(existingAssignment);
         });
     }
 

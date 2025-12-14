@@ -20,11 +20,11 @@ public class QuizDomain {
 
     public void addQuestion(QuestionDomain question) {
         questions.add(question);
-        question.setQuiz(this);
+        question.setQuizId(this.quizId);
     }
 
     public void removeQuestion(QuestionDomain question) {
         questions.remove(question);
-        question.setQuiz(null);
+        question.setQuizId(null);
     }
 }

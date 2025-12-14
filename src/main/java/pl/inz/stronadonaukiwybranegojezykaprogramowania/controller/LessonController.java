@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request.LessonRequest;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.LessonDTO;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.LessonDomain;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.CourseService;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.LessonService;
 
@@ -24,7 +24,7 @@ public class LessonController {
     }
 
     @PostMapping("/add")
-    public Lesson createLesson(@RequestBody LessonRequest lessonRequest) {
+    public LessonDomain createLesson(@RequestBody LessonRequest lessonRequest) {
         return lessonService.createLesson(lessonRequest.getTitle(),
                 lessonRequest.getContent(),
                 lessonRequest.getCourseId(),
@@ -43,12 +43,12 @@ public class LessonController {
         }
     }
     @GetMapping("/all")
-    public List<Lesson> getAllLessons() {
+    public List<LessonDomain> getAllLessons() {
         return lessonService.getAllLessons();
     }
 
     @GetMapping("/{id}")
-    public Optional<Lesson> getLessonById(@PathVariable Long id) {
+    public Optional<LessonDomain> getLessonById(@PathVariable Long id) {
         return lessonService.getLessonById(id);
     }
 }

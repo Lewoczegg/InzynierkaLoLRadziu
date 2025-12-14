@@ -4,12 +4,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.LessonDTO;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Course;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Lesson;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.User;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.CourseRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.LessonRepository;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.UserRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.CourseDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.LessonDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.UserDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.CourseRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.LessonRepositoryAdapter;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.UserRepositoryAdapter;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -18,21 +18,21 @@ import java.util.stream.Collectors;
 
 @Service
 public class LessonService {
-    private final LessonRepository lessonRepository;
-    private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
+    private final LessonRepositoryAdapter lessonRepositoryAdapter;
+    private final CourseRepositoryAdapter courseRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
 
-    public LessonService(LessonRepository lessonRepository, CourseRepository courseRepository, UserRepository userRepository) {
-        this.lessonRepository = lessonRepository;
-        this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
+    public LessonService(LessonRepositoryAdapter lessonRepositoryAdapter, CourseRepositoryAdapter courseRepositoryAdapter, UserRepositoryAdapter userRepositoryAdapter) {
+        this.lessonRepositoryAdapter = lessonRepositoryAdapter;
+        this.courseRepositoryAdapter = courseRepositoryAdapter;
+        this.userRepositoryAdapter = userRepositoryAdapter;
     }
-    public Lesson createLesson(String title, String content, Long courseId, Integer lessonNumber, Integer requiredLevel) {
-        Optional<Course> courseOpt = courseRepository.findById(courseId);
+    public LessonDomain createLesson(String title, String content, Long courseId, Integer lessonNumber, Integer requiredLevel) {
+        Optional<CourseDomain> courseOpt = courseRepositoryAdapter.findById(courseId);
         if (courseOpt.isEmpty()) {
             throw new RuntimeException("Course not found");
         }
-        Lesson lesson = new Lesson();
+        LessonDomain lesson = new LessonDomain();
         lesson.setTitle(title);
         lesson.setContent(content);
         lesson.setCourse(courseOpt.get());
@@ -41,7 +41,7 @@ public class LessonService {
         lesson.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         lesson.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-        return lessonRepository.save(lesson);
+        return lessonRepositoryAdapter.save(lesson);
     }
 
     public List<LessonDTO> getVisibleLessonsForUser() {
@@ -51,13 +51,13 @@ public class LessonService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
         int userLevel = user.getLevel();
-        List<Lesson> allLessons = getAllLessons();
+        List<LessonDomain> allLessons = getAllLessons();
         return allLessons.stream()
                 .map(lesson -> {
                     boolean available = userLevel >= lesson.getRequiredLevel();
@@ -66,11 +66,11 @@ public class LessonService {
                 .collect(Collectors.toList());
     }
 
-    public List<Lesson> getAllLessons() {
-        return lessonRepository.findAll();
+    public List<LessonDomain> getAllLessons() {
+        return lessonRepositoryAdapter.findAll();
     }
 
-    public Optional<Lesson> getLessonById(Long id) {
-        return lessonRepository.findById(id);
+    public Optional<LessonDomain> getLessonById(Long id) {
+        return lessonRepositoryAdapter.findById(id);
     }
 }

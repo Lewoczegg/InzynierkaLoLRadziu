@@ -9,7 +9,7 @@ import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.AssignmentR
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.api.response.CodeExecutionResponse;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.AssignmentDTO;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.dto.CourseDTO;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Assignment;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.AssignmentDomain;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.service.AssignmentService;
 
 import java.util.*;
@@ -49,7 +49,7 @@ public class AssignmentController {
     }
 
     @PostMapping("/add")
-    public Assignment createLesson(@RequestBody AssignmentAddRequest assignmentAddRequest) {
+    public AssignmentDomain createLesson(@RequestBody AssignmentAddRequest assignmentAddRequest) {
         return assignmentService.createAssignment(assignmentAddRequest.getTitle(),
                 assignmentAddRequest.getContent(),
                 assignmentAddRequest.getLessonId(),
@@ -57,7 +57,7 @@ public class AssignmentController {
     }
 
     @GetMapping("/all")
-    public List<Assignment> getAllAssignments() {
+    public List<AssignmentDomain> getAllAssignments() {
         return assignmentService.getAllAssignments();
     }
 
@@ -91,8 +91,8 @@ public class AssignmentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Assignment> updateAssignment(@PathVariable Long id, @RequestBody Assignment updatedAssignment) {
-        Optional<Assignment> assignment = assignmentService.updateAssignment(id, updatedAssignment);
+    public ResponseEntity<AssignmentDomain> updateAssignment(@PathVariable Long id, @RequestBody AssignmentDomain updatedAssignment) {
+        Optional<AssignmentDomain> assignment = assignmentService.updateAssignment(id, updatedAssignment);
         return assignment.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

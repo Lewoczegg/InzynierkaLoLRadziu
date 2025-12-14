@@ -4,8 +4,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.enums.Title;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.*;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.*;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.*;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.*;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -14,20 +14,20 @@ import java.util.Optional;
 @Service
 public class ProgressService {
 
-    private final ProgressRepository progressRepository;
-    private final UserRepository userRepository;
-    private final LessonRepository lessonRepository;
-    private final AssignmentRepository assignmentRepository;
-    private final SubmissionRepository submissionRepository;
-    private final CourseRepository courseRepository;
+    private final ProgressRepositoryAdapter progressRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
+    private final LessonRepositoryAdapter lessonRepositoryAdapter;
+    private final AssignmentRepositoryAdapter assignmentRepositoryAdapter;
+    private final SubmissionRepositoryAdapter submissionRepositoryAdapter;
+    private final CourseRepositoryAdapter courseRepositoryAdapter;
 
-    public ProgressService(ProgressRepository progressRepository, UserRepository userRepository, LessonRepository lessonRepository, AssignmentRepository assignmentRepository, SubmissionRepository submissionRepository, CourseRepository courseRepository) {
-        this.progressRepository = progressRepository;
-        this.userRepository = userRepository;
-        this.lessonRepository = lessonRepository;
-        this.assignmentRepository = assignmentRepository;
-        this.submissionRepository = submissionRepository;
-        this.courseRepository = courseRepository;
+    public ProgressService(ProgressRepositoryAdapter progressRepositoryAdapter, UserRepositoryAdapter userRepositoryAdapter, LessonRepositoryAdapter lessonRepositoryAdapter, AssignmentRepositoryAdapter assignmentRepositoryAdapter, SubmissionRepositoryAdapter submissionRepositoryAdapter, CourseRepositoryAdapter courseRepositoryAdapter) {
+        this.progressRepositoryAdapter = progressRepositoryAdapter;
+        this.userRepositoryAdapter = userRepositoryAdapter;
+        this.lessonRepositoryAdapter = lessonRepositoryAdapter;
+        this.assignmentRepositoryAdapter = assignmentRepositoryAdapter;
+        this.submissionRepositoryAdapter = submissionRepositoryAdapter;
+        this.courseRepositoryAdapter = courseRepositoryAdapter;
     }
 
     public void markLessonAsCompleted(Long lessonId) {
@@ -37,43 +37,43 @@ public class ProgressService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
-        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
-        Course course = lesson.getCourse();
+        LessonDomain lesson = lessonRepositoryAdapter.findById(lessonId).orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
+        CourseDomain course = lesson.getCourse();
 
-        Optional<Progress> existingProgress = progressRepository.findByUserUserIdAndLessonLessonId(user.getUserId(), lesson.getLessonId());
+        Optional<ProgressDomain> existingProgress = progressRepositoryAdapter.findByUserUserIdAndLessonLessonId(user.getUserId(), lesson.getLessonId());
         if (existingProgress.isPresent()) {
             return;
         }
 
-        List<Assignment> assignments = assignmentRepository.findByLessonLessonId(lesson.getLessonId());
-        for (Assignment assignment : assignments) {
-            Optional<Submission> submission = submissionRepository.findTopByUserUserIdAndAssignmentAssignmentIdOrderBySubmittedAtDesc(
+        List<AssignmentDomain> assignments = assignmentRepositoryAdapter.findByLessonLessonId(lesson.getLessonId());
+        for (AssignmentDomain assignment : assignments) {
+            Optional<SubmissionDomain> submission = submissionRepositoryAdapter.findTopByUserUserIdAndAssignmentAssignmentIdOrderBySubmittedAtDesc(
                     user.getUserId(), assignment.getAssignmentId());
             if (submission.isEmpty()) {
                 return;
             }
         }
-        Progress progress = new Progress();
+        ProgressDomain progress = new ProgressDomain();
         progress.setUser(user);
         progress.setCourse(course);
         progress.setLesson(lesson);
         progress.setCompletedAt(new Timestamp(System.currentTimeMillis()));
-        progressRepository.save(progress);
+        progressRepositoryAdapter.save(progress);
         user.setLevel(user.getLevel() + 1);
-        userRepository.save(user);
+        userRepositoryAdapter.save(user);
 
-        long completedLessonsCount = progressRepository.countByUserUserId(user.getUserId());
+        long completedLessonsCount = progressRepositoryAdapter.countByUserUserId(user.getUserId());
         if (user.getLevel() >= 7) {
             user.setTitle(Title.ADVANCED);
         } else if (completedLessonsCount >= 3) {
             user.setTitle(Title.INTERMEDIATE);
         }
-        userRepository.save(user);
+        userRepositoryAdapter.save(user);
     }
 
     public double calculateAssignmentCompletionPercentage() {
@@ -84,16 +84,16 @@ public class ProgressService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
         // Licz całkowitą liczbę wszystkich zadań w systemie
-        long totalAssignments = assignmentRepository.count();
+        long totalAssignments = assignmentRepositoryAdapter.count();
 
         // Licz liczbę unikalnych zadań, dla których użytkownik wykonał przynajmniej jedno przesłanie (Submission)
-        long completedAssignments = submissionRepository.countDistinctAssignmentsByUserUserId(user.getUserId());
+        long completedAssignments = submissionRepositoryAdapter.countDistinctAssignmentsByUserUserId(user.getUserId());
 
         if (totalAssignments == 0) {
             return 0.0;
@@ -110,16 +110,16 @@ public class ProgressService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
         // Licz całkowitą liczbę wszystkich lekcji w systemie
-        long totalLessons = lessonRepository.count();
+        long totalLessons = lessonRepositoryAdapter.count();
 
         // Licz liczbę lekcji ukończonych przez użytkownika (w Progress z niepustym completedAt)
-        long completedLessons = progressRepository.countByUser_UserIdAndCompletedAtIsNotNull(user.getUserId());
+        long completedLessons = progressRepositoryAdapter.countByUser_UserIdAndCompletedAtIsNotNull(user.getUserId());
 
         if (totalLessons == 0) {
             return 0.0;
@@ -137,24 +137,24 @@ public class ProgressService {
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        UserDomain user = userRepositoryAdapter.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("User not found");
         }
 
         // Pobierz wszystkie kursy
-        List<Course> allCourses = courseRepository.findAll();
+        List<CourseDomain> allCourses = courseRepositoryAdapter.findAll();
 
         // Zmienna do zliczania ukończonych kursów
         long completedCoursesCount = 0;
 
         // Iteruj przez każdy kurs
-        for (Course course : allCourses) {
+        for (CourseDomain course : allCourses) {
             // Liczba wszystkich lekcji w danym kursie
-            long totalLessonsInCourse = lessonRepository.countByCourse_CourseId(course.getCourseId());
+            long totalLessonsInCourse = lessonRepositoryAdapter.countByCourse_CourseId(course.getCourseId());
 
             // Liczba lekcji ukończonych przez użytkownika w danym kursie
-            long completedLessonsInCourse = progressRepository.countByUser_UserIdAndCourse_CourseIdAndCompletedAtIsNotNull(user.getUserId(), course.getCourseId());
+            long completedLessonsInCourse = progressRepositoryAdapter.countByUser_UserIdAndCourse_CourseIdAndCompletedAtIsNotNull(user.getUserId(), course.getCourseId());
 
             // Jeśli wszystkie lekcje są ukończone, kurs jest uznany za ukończony
             if (totalLessonsInCourse > 0 && totalLessonsInCourse == completedLessonsInCourse) {

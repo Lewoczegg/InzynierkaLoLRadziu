@@ -2,16 +2,11 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.postgresql.mapp
 
 import org.springframework.stereotype.Component;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.postgresql.entity.QuestionEntityPostgres;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.postgresql.entity.QuizEntityPostgres;
 import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.QuestionDomain;
 
 @Component
 public class QuestionMapperPostgres {
-
-    private final QuizMapperPostgres quizMapper;
-
-    public QuestionMapperPostgres(QuizMapperPostgres quizMapper) {
-        this.quizMapper = quizMapper;
-    }
 
     public QuestionDomain toDomain(QuestionEntityPostgres entity) {
         if (entity == null) {
@@ -23,7 +18,7 @@ public class QuestionMapperPostgres {
                 .content(entity.getContent())
                 .options(entity.getOptions())
                 .correctAnswer(entity.getCorrectAnswer())
-                .quiz(quizMapper.toDomain(entity.getQuiz()))
+                .quizId(entity.getQuiz() != null ? entity.getQuiz().getQuizId() : null)
                 .build();
     }
 
@@ -32,12 +27,19 @@ public class QuestionMapperPostgres {
             return null;
         }
         
-        return QuestionEntityPostgres.builder()
+        QuestionEntityPostgres entity = QuestionEntityPostgres.builder()
                 .questionId(domain.getQuestionId())
                 .content(domain.getContent())
                 .options(domain.getOptions())
                 .correctAnswer(domain.getCorrectAnswer())
-                .quiz(quizMapper.toEntity(domain.getQuiz()))
                 .build();
+        
+        if (domain.getQuizId() != null) {
+            QuizEntityPostgres quiz = new QuizEntityPostgres();
+            quiz.setQuizId(domain.getQuizId());
+            entity.setQuiz(quiz);
+        }
+        
+        return entity;
     }
 }

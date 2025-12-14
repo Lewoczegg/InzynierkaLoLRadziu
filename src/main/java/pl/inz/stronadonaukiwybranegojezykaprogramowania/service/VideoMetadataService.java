@@ -6,8 +6,8 @@ import org.springframework.core.io.UrlResource;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.VideoMetadata;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.repository.VideoMetadataRepository;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.domain.VideoMetadataDomain;
+import pl.inz.stronadonaukiwybranegojezykaprogramowania.adapter.VideoMetadataRepositoryAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,13 +20,13 @@ public class VideoMetadataService {
     private final Path fileStorageLocation = Paths.get("src/videos").toAbsolutePath().normalize();
 
 
-    private final VideoMetadataRepository videoMetadataRepository;
+    private final VideoMetadataRepositoryAdapter videoMetadataRepositoryAdapter;
 
-    public VideoMetadataService(VideoMetadataRepository videoMetadataRepository) {
-        this.videoMetadataRepository = videoMetadataRepository;
+    public VideoMetadataService(VideoMetadataRepositoryAdapter videoMetadataRepositoryAdapter) {
+        this.videoMetadataRepositoryAdapter = videoMetadataRepositoryAdapter;
     }
 
-    public VideoMetadata saveVideo(MultipartFile file) {
+    public VideoMetadataDomain saveVideo(MultipartFile file) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
@@ -41,11 +41,11 @@ public class VideoMetadataService {
             File destinationFile = new File(filePath);
             file.transferTo(destinationFile);
 
-            VideoMetadata metadata = new VideoMetadata();
+            VideoMetadataDomain metadata = new VideoMetadataDomain();
             metadata.setFileName(file.getOriginalFilename());
             metadata.setFilePath(filePath);
             metadata.setFileSize(file.getSize());
-            return videoMetadataRepository.save(metadata);
+            return videoMetadataRepositoryAdapter.save(metadata);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file: " + e.getMessage());

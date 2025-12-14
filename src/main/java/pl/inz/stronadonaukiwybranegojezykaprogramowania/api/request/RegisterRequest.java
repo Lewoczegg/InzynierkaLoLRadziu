@@ -3,9 +3,7 @@ package pl.inz.stronadonaukiwybranegojezykaprogramowania.api.request;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.inz.stronadonaukiwybranegojezykaprogramowania.model.Role;
 
-import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
