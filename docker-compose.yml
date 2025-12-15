@@ -22,3 +22,15 @@ services:
       - "5432:5432"
     volumes:
       - ./src/main/resources/PostgreSQLmigration.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mongodb:
+    image: mongo:7.0
+    container_name: codeseries-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_DATABASE: codeseries
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./src/main/resources/MongoDBmigration_full.js:/docker-entrypoint-initdb.d/init.js
