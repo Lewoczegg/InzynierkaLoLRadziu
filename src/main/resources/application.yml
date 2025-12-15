@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: mysql  # Options: mysql, postgresql
+    active: mongodb  # Options: mysql, postgresql, mongodb
 
   servlet:
     multipart:

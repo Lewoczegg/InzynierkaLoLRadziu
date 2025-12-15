@@ -1,0 +1,16 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  data:
+    mongodb:
+      uri: mongodb://root:1234@localhost:27017/codeseries?authSource=admin
+      # Alternative explicit configuration:
+      # host: localhost
+      # port: 27017
+      # database: codeseries
+      # username: root
+      # password: 1234
+      # authentication-database: admin
