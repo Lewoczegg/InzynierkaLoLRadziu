@@ -95,8 +95,20 @@ public class QuizResultRepositoryAdapterMongoDB implements QuizResultRepositoryA
 
     @Override
     public List<Object[]> findTotalPointsForAllUsers() {
-        // TODO: Implement aggregation for total points per user
-        return List.of();
+        return userRepository.findAll().stream()
+                .map(userDoc -> {
+                    if (userDoc.getQuizResults() == null) {
+                        return new Object[]{userDoc.getUsername(), 0L};
+                    }
+                    
+                    Long totalPoints = userDoc.getQuizResults().stream()
+                            .filter(result -> result.getPoints() != null)
+                            .mapToLong(QuizResultEmbedded::getPoints)
+                            .sum();
+                    
+                    return new Object[]{userDoc.getUsername(), totalPoints};
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

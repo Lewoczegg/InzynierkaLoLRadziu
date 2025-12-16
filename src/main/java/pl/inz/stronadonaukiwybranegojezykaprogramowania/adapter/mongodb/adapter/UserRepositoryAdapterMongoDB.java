@@ -20,7 +20,6 @@ public class UserRepositoryAdapterMongoDB implements UserRepositoryAdapter {
     private final UserRepositoryMongoDB userRepository;
     private final UserMapperMongoDB userMapper;
     private final SequenceGeneratorService sequenceGeneratorService;
-    // TODO: Will need RoleRepositoryAdapter to fetch roles
 
     public UserRepositoryAdapterMongoDB(UserRepositoryMongoDB userRepository, UserMapperMongoDB userMapper, SequenceGeneratorService sequenceGeneratorService) {
         this.userRepository = userRepository;
@@ -34,8 +33,6 @@ public class UserRepositoryAdapterMongoDB implements UserRepositoryAdapter {
         if (userDoc == null) {
             return null;
         }
-        // TODO: Fetch role based on roleIdLegacy
-        RoleDomain role = null; // Placeholder
         return userMapper.toDomain(userDoc);
     }
 
@@ -60,14 +57,12 @@ public class UserRepositoryAdapterMongoDB implements UserRepositoryAdapter {
 
     @Override
     public Optional<UserDomain> findById(Long id) {
-		// TODO: Fetch role based on roleIdLegacy
 		return userRepository.findById(id)
                 .map(userMapper::toDomain);
     }
 
     @Override
     public List<UserDomain> findAll() {
-		// TODO: Fetch role based on roleIdLegacy
 		return userRepository.findAll().stream()
                 .map(userMapper::toDomain)
                 .collect(Collectors.toList());
