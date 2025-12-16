@@ -292,7 +292,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(49), title: '2. Add Two Integer Numberse',
+            assignmentId: NumberLong(2), title: '2. Add Two Integer Numberse',
             description: 'Write a function that takes two integer inputs and returns their sum. Ensure that you handle proper addition and return the correct result. The integers can be any arbitrary values provided as inputs.\n\nExamples:\n\n- If the inputs are 3 and 5, the function should return 8.\n- If the inputs are -2 and 7, the function should return 5.\n- If the inputs are 0 and 0, the function should return 0.\n\nThis task tests your understanding of basic arithmetic operations and how to handle function inputs and outputs.',
             titleLevel: 'BEGINNER',
             createdAt: new Date('2024-11-02T17:57:05.441Z'),
@@ -331,7 +331,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(70), title: '3. Display the Value of a Variable',
+            assignmentId: NumberLong(3), title: '3. Display the Value of a Variable',
             description: 'Write a function that declares a variable, assigns it a value, and then displays (prints) its value. Ensure that the variable is properly declared, initialized, and printed in your chosen programming language.\n\nExamples:\n\n- If the variable is assigned the value 42, the function should print: 42.\n- If the variable is assigned the value -7, the function should print: -7.\n- If the variable is assigned the value 0, the function should print: 0.\n\nThis task tests your understanding of variable declaration, initialization, and basic output operations.',
             titleLevel: 'BEGINNER',
             createdAt: new Date('2024-11-19T12:28:25.500Z'),
@@ -367,7 +367,7 @@ db.courses.insertMany([
         comments: [],
         assignments: [
           {
-            assignmentId: NumberLong(77), title: '4. Use the Addition Operator with Two Numbers',
+            assignmentId: NumberLong(4), title: '4. Use the Addition Operator with Two Numbers',
             description: 'Write a function that takes two numbers as inputs and uses the addition operator (`+`) to calculate their sum. The function should return the result of the addition. The numbers can be integers or floating-point values.\n\nExamples:\n\n- If the inputs are 3 and 5, the function should return 8.\n- If the inputs are 2.5 and 4.3, the function should return 6.8.\n- If the inputs are -7 and 2, the function should return -5.\n\nThis task tests your understanding of using the addition operator to combine numerical values.',
             titleLevel: 'BEGINNER',
             createdAt: new Date('2024-11-19T12:53:48.390Z'),
@@ -390,7 +390,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(82), title: '5. Use the Multiplication Operator',
+            assignmentId: NumberLong(5), title: '5. Use the Multiplication Operator',
             description: 'Write a function that takes two numbers as inputs and uses the multiplication operator (`*`) to calculate their product. The function should return the result of the multiplication. The numbers can be integers or floating-point values.\n\nExamples:\n\n- If the inputs are 4 and 5, the function should return 20.\n- If the inputs are 2.5 and 3, the function should return 7.5.\n- If the inputs are -3 and -2, the function should return 6.\n\nThis task tests your understanding of using the multiplication operator to calculate products.',
             titleLevel: 'BEGINNER',
             createdAt: new Date('2024-11-19T12:54:10.724Z'),
@@ -414,7 +414,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(88), title: '6. Perform Division and Round the Result',
+            assignmentId: NumberLong(6), title: '6. Perform Division and Round the Result',
             description: 'Write a function that takes two numbers as inputs, performs division using the division operator (`/`), and rounds the result to the nearest integer. The function should handle any valid division scenario (excluding division by zero) and return the rounded result.\n\nExamples:\n\n- If the inputs are 10 and 3, the function should return 3 (10 ÷ 3 = 3.333, rounded to 3).\n- If the inputs are 7 and 2, the function should return 4 (7 ÷ 2 = 3.5, rounded to 4).\n- If the inputs are -8 and 3, the function should return -3 (-8 ÷ 3 = -2.666, rounded to -3).\n\nThis task tests your understanding of division, handling numerical operations, and rounding results.',
             titleLevel: 'BEGINNER',
             createdAt: new Date('2024-11-19T12:54:29.663Z'),
@@ -449,7 +449,7 @@ db.courses.insertMany([
         comments: [],
         assignments: [
           {
-            assignmentId: NumberLong(94), title: '7. Write an If Statement to Check if a Number is Even',
+            assignmentId: NumberLong(7), title: '7. Write an If Statement to Check if a Number is Even',
             description: 'Write a function that takes an integer as input and uses an `if` statement to check whether the number is even. If the number is even, the function should return `true` or a specific message indicating that the number is even. Ensure the logic for checking even numbers is correct (e.g., using the modulus operator `%`).\n\nExamples:\n\n- If the input is 4, the function should return `true` or \'4 is even\'.\n- If the input is 7, the function should not return anything or may return `false`.\n- If the input is 0, the function should return `true` or \'0 is even\'.\n\nThis task tests your understanding of conditional statements and the concept of even numbers.',
             titleLevel: 'BEGINNER',
             createdAt: new Date('2024-11-19T12:59:27.731Z'),
@@ -472,7 +472,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(99), title: '8. Use an Else Statement',
+            assignmentId: NumberLong(8), title: '8. Use an Else Statement',
             description: 'Write a function that takes an integer as input and uses an `if` statement to check whether the number is positive. If the number is positive, return a message indicating it is positive. Otherwise, use an `else` statement to return a message indicating the number is not positive. Ensure the function covers both cases.\n\nExamples:\n\n- If the input is 5, the function should return \'5 is positive\'.\n- If the input is -3, the function should return \'-3 is not positive\'.\n- If the input is 0, the function should return \'0 is not positive\'.\n\nThis task tests your understanding of conditional statements, including the use of `else` to handle alternative cases.',
             titleLevel: 'BEGINNER',
             createdAt: new Date('2024-11-19T13:00:01.952Z'),
@@ -495,7 +495,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(104), title: '9. Write an If-Else Statement to Compare Two Numbers',
+            assignmentId: NumberLong(9), title: '9. Write an If-Else Statement to Compare Two Numbers',
             description: 'Write a function that takes two numbers as inputs and uses an `if-else` statement to compare them. If the first number is greater than the second, return a message indicating this. Otherwise, return a message indicating that the first number is not greater than the second.\n\nExamples:\n\n- If the inputs are 10 and 5, the function should return \'10 is greater than 5\'.\n- If the inputs are 3 and 7, the function should return \'3 is not greater than 7\'.\n- If the inputs are 4 and 4, the function should return \'4 is not greater than 4\'.\n\nThis task tests your understanding of comparison operators and conditional statements.',
             titleLevel: 'BEGINNER',
             createdAt: new Date('2024-11-19T13:00:19.924Z'),
@@ -538,7 +538,7 @@ db.courses.insertMany([
         comments: [],
         assignments: [
           {
-            assignmentId: NumberLong(109), title: '10. Define an Array of Specific Integers',
+            assignmentId: NumberLong(10), title: '10. Define an Array of Specific Integers',
             description: 'Write a function that defines and initializes an array (or list) of integers. The array should be filled with specific values provided in the example below. Ensure that the array contains exactly the ten predefined integers given.\n\nExamples:\n\n- The array should be [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]. The function should return [10, 20, 30, 40, 50, 60, 70, 80, 90, 100].\n- Alternatively, the array can be [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]. The function should return [5, 15, 25, 35, 45, 55, 65, 75, 85, 95].\n\nThis task tests your understanding of arrays (or lists), their initialization, and the ability to use specific predefined values.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:07:52.059Z'),
@@ -560,7 +560,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(113), title: '11. Calculate the Sum of All Elements in an Array',
+            assignmentId: NumberLong(11), title: '11. Calculate the Sum of All Elements in an Array',
             description: 'Write a function that calculates the sum of all elements in a given array (or list) of integers. Assign the result to a variable called `sum`. Make sure the function takes the array as input and returns the calculated sum.\n\nExamples:\n\n- If the array is [1, 2, 3, 4, 5], the function should return 15 because 1 + 2 + 3 + 4 + 5 = 15.\n- If the array is [10, 20, 30, 40, 50], the function should return 150 because 10 + 20 + 30 + 40 + 50 = 150.\n\nThis task tests your ability to iterate through an array, accumulate values, and assign the final result to a variable.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:08:08.958Z'),
@@ -582,7 +582,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(117), title: '12. Find the Largest Element in an Array',
+            assignmentId: NumberLong(12), title: '12. Find the Largest Element in an Array',
             description: 'Write a function that takes an array (or list) of integers as input and returns the largest element in the array. Ensure that the function iterates through the array to find the maximum value.\n\nExamples:\n\n- If the input is [1, 2, 3, 4, 5], the function should return 5.\n- If the input is [-10, -3, -7, -2], the function should return -2.\n- If the input is [0, 0, 0], the function should return 0.\n\nThis task tests your understanding of iteration, comparison, and finding the maximum value in an array.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:08:24.756Z'),
@@ -616,7 +616,7 @@ db.courses.insertMany([
         comments: [],
         assignments: [
           {
-            assignmentId: NumberLong(122), title: '13. Use a For Loop to Calculate the Sum of Even Numbers',
+            assignmentId: NumberLong(13), title: '13. Use a For Loop to Calculate the Sum of Even Numbers',
             description: 'Write a for loop that calculates the sum of all even numbers between 1 and 20 (inclusive). Assign the result to a variable called `sum`. Ensure that only even numbers are included in the calculation.\n\nExamples:\n\n- The sum should be 110, because 2 + 4 + 6 + 8 + 10 + 12 + 14 + 16 + 18 + 20 = 110.\n\nThis task tests your understanding of using a loop to iterate through a range of numbers, identifying even numbers, and accumulating their values into a single sum.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:08:55.523Z'),
@@ -638,7 +638,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(126), title: '14. Write a While Loop to Sum Numbers',
+            assignmentId: NumberLong(14), title: '14. Write a While Loop to Sum Numbers',
             description: 'Write a function that uses a `while` loop to sum the numbers from 1 to a given integer `n`. The function should take `n` as input and return the sum of all numbers from 1 to `n`.\n\nExamples:\n\n- If the input is 5, the function should return 15 (1 + 2 + 3 + 4 + 5).\n- If the input is 10, the function should return 55.\n\nThis task tests your understanding of `while` loops, conditional logic, and basic arithmetic.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:09:10.789Z'),
@@ -660,7 +660,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(130), title: '15. Use a While Loop to Find a Number Divisible by 7',
+            assignmentId: NumberLong(15), title: '15. Use a While Loop to Find a Number Divisible by 7',
             description: 'Write a while loop that generates random numbers between 1 and 50 until a number divisible by 7 is found. Use an appropriate random number generating function. Once a number divisible by 7 is found, use the `break` statement to exit the loop.\n\nExamples:\n\n- The loop should keep generating numbers like 34, 5, 13, 28 until it finds a number like 14 (which is divisible by 7). At this point, the loop should stop.\n\nThis task tests your understanding of while loops, generating random numbers, conditional checks for divisibility, and the use of the `break` statement to exit the loop when a condition is met.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:09:25.225Z'),
@@ -693,7 +693,7 @@ db.courses.insertMany([
         comments: [],
         assignments: [
           {
-            assignmentId: NumberLong(134), title: '16. Write a Function to Return the Sum of Two Numbers',
+            assignmentId: NumberLong(16), title: '16. Write a Function to Return the Sum of Two Numbers',
             description: 'Write a function that takes two numbers as inputs and returns their sum. Ensure the function correctly calculates and returns the result.\n\nExamples:\n\n- If the inputs are 3 and 5, the function should return 8.\n- If the inputs are -2 and 10, the function should return 8.\n\nThis task tests your understanding of function creation, input handling, and returning results.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:09:54.371Z'),
@@ -715,7 +715,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(138), title: '17. Create a Function to Return the Largest Number in a List',
+            assignmentId: NumberLong(17), title: '17. Create a Function to Return the Largest Number in a List',
             description: 'Write a function that takes a list of numbers as input and returns the largest number in the list. Ensure that the function iterates through the list to find the maximum value.\n\nExamples:\n\n- If the input is [1, 2, 3, 4, 5], the function should return 5.\n- If the input is [-10, -3, -7, -2], the function should return -2.\n- If the input is [0, 0, 0], the function should return 0.\n\nThis task tests your understanding of iteration, comparison, and finding the maximum value in a list.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:10:17.887Z'),
@@ -737,7 +737,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(142), title: '18. Create a Function to Return the Largest Number in a List',
+            assignmentId: NumberLong(18), title: '18. Create a Function to Return the Largest Number in a List',
             description: 'Write a function that takes a non-negative integer `n` as input and calculates its factorial using recursion. The factorial of a number is defined as `n! = n * (n-1) * ... * 1`, with the base case `0! = 1`.\n\nExamples:\n\n- If the input is 5, the function should return 120 (5! = 5 * 4 * 3 * 2 * 1).\n- If the input is 0, the function should return 1 (0! = 1).\n- If the input is 3, the function should return 6 (3! = 3 * 2 * 1).\n\nThis task tests your understanding of recursion, base cases, and mathematical calculations.',
             titleLevel: 'INTERMEDIATE',
             createdAt: new Date('2024-11-19T13:10:33.003Z'),
@@ -779,7 +779,7 @@ db.courses.insertMany([
         comments: [],
         assignments: [
           {
-            assignmentId: NumberLong(146), title: '19. Write a Recursive Function to Calculate the Sum of Numbers from 1 to n',
+            assignmentId: NumberLong(19), title: '19. Write a Recursive Function to Calculate the Sum of Numbers from 1 to n',
             description: 'Write a function that takes a positive integer `n` as input and calculates the sum of all numbers from 1 to `n` using recursion. The base case should handle when `n` is 0, returning 0, and the recursive case should sum `n` with the result of the function called on `n-1`.\n\nExamples:\n\n- If the input is 5, the function should return 15 (1 + 2 + 3 + 4 + 5).\n- If the input is 10, the function should return 55 (1 + 2 + ... + 10).\n- If the input is 1, the function should return 1.\n\nThis task tests your understanding of recursion, base cases, and arithmetic progression.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:11:47.618Z'),
@@ -801,7 +801,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(150), title: '20. Create a Function to Find the nth Fibonacci Number',
+            assignmentId: NumberLong(20), title: '20. Create a Function to Find the nth Fibonacci Number',
             description: 'Write a function that takes a non-negative integer `n` as input and returns the nth Fibonacci number using recursion. The Fibonacci sequence is defined as:\n  - F(0) = 0\n  - F(1) = 1\n  - F(n) = F(n-1) + F(n-2) for n > 1\n\nExamples:\n\n- If the input is 0, the function should return 0.\n- If the input is 1, the function should return 1.\n- If the input is 5, the function should return 5 (Fibonacci sequence: 0, 1, 1, 2, 3, 5).\n- If the input is 7, the function should return 13.\n\nThis task tests your understanding of recursion, mathematical sequences, and efficient computation.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:12:02.985Z'),
@@ -823,7 +823,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(154), title: '21. Solve the Tower of Hanoi Problem Using Recursion',
+            assignmentId: NumberLong(21), title: '21. Solve the Tower of Hanoi Problem Using Recursion',
             description: 'Write a function that solves the Tower of Hanoi problem for `n` disks. The function should take three inputs: the source rod, the destination rod, and the auxiliary rod. The goal is to move all disks from the source rod to the destination rod following these rules:\n\n1. Only one disk can be moved at a time.\n2. A disk can only be placed on top of a larger disk or on an empty rod.\n\nThe function should print each move in the format: \'Move disk from [source] to [destination]\'. Use recursion to break the problem into smaller subproblems.\n\nExamples:\n\n- For `n = 2`, the output should be:\n  Move disk from A to B\n  Move disk from A to C\n  Move disk from B to C\n\n- For `n = 3`, the output should be:\n  Move disk from A to C\n  Move disk from A to B\n  Move disk from C to B\n  Move disk from A to C\n  Move disk from B to A\n  Move disk from B to C\n  Move disk from A to C\n\nThis task tests your understanding of recursion, breaking down complex problems, and solving algorithmic challenges.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:12:14.568Z'),
@@ -856,7 +856,7 @@ db.courses.insertMany([
         comments: [],
         assignments: [
           {
-            assignmentId: NumberLong(158), title: '22. Implement Bubble Sort',
+            assignmentId: NumberLong(22), title: '22. Implement Bubble Sort',
             description: 'Write a function that implements the Bubble Sort algorithm to sort a list of numbers in ascending order. The function should repeatedly compare adjacent elements in the list and swap them if they are in the wrong order. This process should continue until the list is fully sorted.\n\nExamples:\n\n- If the input is [5, 3, 8, 6, 2], the function should return [2, 3, 5, 6, 8].\n- If the input is [1, 4, 3, 2], the function should return [1, 2, 3, 4].\n- If the input is [10, 20, 5, 15], the function should return [5, 10, 15, 20].\n\nThis task tests your understanding of sorting algorithms and iterative problem-solving.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:13:01.662Z'),
@@ -878,7 +878,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(162), title: '23. Implement Quick Sort',
+            assignmentId: NumberLong(23), title: '23. Implement Quick Sort',
             description: 'Write a function that implements the Quick Sort algorithm to sort a list of numbers in ascending order. The function should use the divide-and-conquer strategy by selecting a pivot, partitioning the list into elements less than and greater than the pivot, and recursively sorting the partitions.\n\nExamples:\n\n- If the input is [5, 3, 8, 6, 2], the function should return [2, 3, 5, 6, 8].\n- If the input is [1, 4, 3, 2], the function should return [1, 2, 3, 4].\n- If the input is [10, 20, 5, 15], the function should return [5, 10, 15, 20].\n\nThis task tests your understanding of recursive algorithms and efficient sorting techniques.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:13:13.061Z'),
@@ -900,7 +900,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(166), title: '24. Selection Sort for an Array of Integers',
+            assignmentId: NumberLong(24), title: '24. Selection Sort for an Array of Integers',
             description: 'Write a function to implement Selection Sort for an array of integers. This algorithm sorts an array by repeatedly finding the smallest element from the unsorted portion of the array and placing it in the correct position.\n\nExamples:\n\n- For an array [64, 25, 12, 22, 11], after sorting, the array should be [11, 12, 22, 25, 64].\n- In the first pass, the algorithm selects the smallest value (11) and swaps it with the first element (64), resulting in [11, 25, 12, 22, 64].\n- The sorting continues until all elements are sorted.\n\nThis task tests your ability to implement a classic sorting algorithm, use nested loops, and correctly swap values in an array.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:13:38.544Z'),
@@ -933,7 +933,7 @@ db.courses.insertMany([
         comments: [],
         assignments: [
           {
-            assignmentId: NumberLong(170), title: '25. Create a Class Representing a Stack',
+            assignmentId: NumberLong(25), title: '25. Create a Class Representing a Stack',
             description: 'Write a class that implements a stack data structure. The class should support the following operations:\n\n1. `push(value)` - Adds a value to the top of the stack.\n2. `pop()` - Removes and returns the value at the top of the stack. If the stack is empty, it should handle the error appropriately.\n3. `peek()` - Returns the value at the top of the stack without removing it.\n4. `is_empty()` - Returns `true` if the stack is empty, otherwise `false`.\n\nExamples:\n\n- If the operations are `push(5)`, `push(10)`, `pop()`, the result of `pop()` should be `10`, and the stack will contain [5].\n- If the stack is empty and `pop()` is called, it should handle the situation gracefully.\n\nThis task tests your understanding of classes, object-oriented programming, and stack operations.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:14:29.165Z'),
@@ -955,7 +955,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(174), title: '26. Implement a Queue with Enqueue and Dequeue Operations',
+            assignmentId: NumberLong(26), title: '26. Implement a Queue with Enqueue and Dequeue Operations',
             description: 'Write a class that implements a queue data structure. The class should support the following operations:\n\n1. `add(value)` - Adds a value to the end of the queue.\n2. `remove()` - Removes and returns the value at the front of the queue. If the queue is empty, it should handle the error appropriately.\n3. `peek()` - Returns the value at the front of the queue without removing it.\n4. `is_empty()` - Returns `true` if the queue is empty, otherwise `false`.\n\nExamples:\n\n- If the operations are `add(5)`, `add(10)`, `remove()`, the result of `remove()` should be `5`, and the queue will contain [10].\n- If the queue is empty and `remove()` is called, it should handle the situation gracefully.\n\nThis task tests your understanding of classes, object-oriented programming, and queue operations.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:14:42.699Z'),
@@ -977,7 +977,7 @@ db.courses.insertMany([
             ]
           },
           {
-            assignmentId: NumberLong(178), title: '27. Write a Class for Working with a Binary Tree',
+            assignmentId: NumberLong(27), title: '27. Write a Class for Working with a Binary Tree',
             description: 'Write a class that represents a binary tree. The class should include methods for common operations:\n\n1. `insert(value)` - Inserts a value into the binary tree following binary search tree rules.\n2. `find(value)` - Searches for a value in the tree and returns `true` if found, otherwise `false`.\n3. `in_order_traversal()` - Returns a list of values in the tree in in-order sequence.\n4. `pre_order_traversal()` - Returns a list of values in pre-order sequence.\n5. `post_order_traversal()` - Returns a list of values in post-order sequence.\n\nExamples:\n\n- If the tree contains [5, 3, 7] and `in_order_traversal()` is called, it should return [3, 5, 7].\n- If the value `5` is inserted into the tree and then `find(5)` is called, it should return `true`.\n- If the tree is empty and `find(1)` is called, it should return `false`.\n\nThis task tests your understanding of binary trees, traversal methods, and object-oriented design.',
             titleLevel: 'ADVANCED',
             createdAt: new Date('2024-11-19T13:14:57.725Z'),
